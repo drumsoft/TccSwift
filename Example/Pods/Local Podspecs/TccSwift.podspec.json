@@ -1,0 +1,22 @@
+{
+  "name": "TccSwift",
+  "version": "0.1.0",
+  "summary": "A short description of TccSwift.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/drumsoft/TccSwift",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "drumsoft": "hrk8@drumsoft.com"
+  },
+  "source": {
+    "git": "https://github.com/drumsoft/TccSwift.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "8.0"
+  },
+  "source_files": "TccSwift/Classes/**/*"
+}

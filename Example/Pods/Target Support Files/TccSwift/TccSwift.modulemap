@@ -1,0 +1,6 @@
+framework module TccSwift {
+  umbrella header "TccSwift-umbrella.h"
+
+  export *
+  module * { export * }
+}
