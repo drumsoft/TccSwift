@@ -28,7 +28,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		151A2A0E0CD6F4C3D8272644 /* TccSwift.podspec */ = {isa = PBXFileReference; includeInIndex = 1; name = TccSwift.podspec; path = ../TccSwift.podspec; sourceTree = "<group>"; };
+		151A2A0E0CD6F4C3D8272644 /* TccSwift.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = TccSwift.podspec; path = ../TccSwift.podspec; sourceTree = "<group>"; };
 		2C6A4A528C57F3DFA74BF7AF /* Pods_TccSwift_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TccSwift_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4462F2DCABBDE5FE46D922CB /* Pods-TccSwift_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TccSwift_Example.release.xcconfig"; path = "Target Support Files/Pods-TccSwift_Example/Pods-TccSwift_Example.release.xcconfig"; sourceTree = "<group>"; };
 		54B982E008F24AC55D7B5EB6 /* Pods-TccSwift_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TccSwift_Tests.debug.xcconfig"; path = "Target Support Files/Pods-TccSwift_Tests/Pods-TccSwift_Tests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -43,10 +43,10 @@
 		607FACEA1AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACEB1AFB9204008FA782 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
 		78CECD943B6D645A91FCFCCA /* Pods-TccSwift_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TccSwift_Tests.release.xcconfig"; path = "Target Support Files/Pods-TccSwift_Tests/Pods-TccSwift_Tests.release.xcconfig"; sourceTree = "<group>"; };
-		825AD925B142EC790358069C /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
+		825AD925B142EC790358069C /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		9A65D4268C44A928CCA39F96 /* Pods-TccSwift_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TccSwift_Example.debug.xcconfig"; path = "Target Support Files/Pods-TccSwift_Example/Pods-TccSwift_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		E5EBEC4721497CBF60A41BA5 /* Pods_TccSwift_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TccSwift_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		F290FA1170DE6FFED1897A9B /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		F290FA1170DE6FFED1897A9B /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -156,7 +156,6 @@
 				54B982E008F24AC55D7B5EB6 /* Pods-TccSwift_Tests.debug.xcconfig */,
 				78CECD943B6D645A91FCFCCA /* Pods-TccSwift_Tests.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -214,10 +213,12 @@
 				TargetAttributes = {
 					607FACCF1AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
+						DevelopmentTeam = CDPREQH4D4;
 						LastSwiftMigration = 0900;
 					};
 					607FACE41AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
+						DevelopmentTeam = CDPREQH4D4;
 						LastSwiftMigration = 0900;
 						TestTargetID = 607FACCF1AFB9204008FA782;
 					};
@@ -228,6 +229,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -499,6 +501,7 @@
 			baseConfigurationReference = 9A65D4268C44A928CCA39F96 /* Pods-TccSwift_Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = CDPREQH4D4;
 				INFOPLIST_FILE = TccSwift/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
@@ -514,6 +517,7 @@
 			baseConfigurationReference = 4462F2DCABBDE5FE46D922CB /* Pods-TccSwift_Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = CDPREQH4D4;
 				INFOPLIST_FILE = TccSwift/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
@@ -528,6 +532,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 54B982E008F24AC55D7B5EB6 /* Pods-TccSwift_Tests.debug.xcconfig */;
 			buildSettings = {
+				DEVELOPMENT_TEAM = CDPREQH4D4;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -550,6 +555,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 78CECD943B6D645A91FCFCCA /* Pods-TccSwift_Tests.release.xcconfig */;
 			buildSettings = {
+				DEVELOPMENT_TEAM = CDPREQH4D4;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
 					"$(inherited)",
