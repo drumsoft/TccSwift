@@ -47,54 +47,17 @@ open class Cube {
     
     public var delegate:CubeDelegate?
     
-    private static var numberCount:Int = 0
-
     public required init(peripheral:CBPeripheral, manager: CubeManager) {
         self.peripheral = peripheral
         self.manager = manager
-        self.number = Cube.numberCount
-        Cube.numberCount += 1
     }
     
     // MARK: Identifiers
     
-    /// serial number of cube entries
-    public let number:Int
     /// name for the Cube peripheral
     open var name:String? { peripheral.name }
     /// identifier string for the Cube peripheral
     open var identifierString:String { peripheral.identifier.uuidString }
-    
-    /// address of cube as a BLE Peripheral
-    open var address: String? { getAddress(self.peripheral.identifier).address }
-    
-    private enum AddressType {
-        case PUBLIC
-        case RANDOM
-        case UNKNOWN
-    }
-    
-    /// get address with UUID
-    /// from https://github.com/Timeular/noble-mac/blob/master/src/objc_cpp.mm
-    private func getAddress(_ uuid: UUID) -> (address:String?, type:AddressType) {
-        let deviceUuid:String = uuid.uuidString;
-        let plist = NSDictionary.init(contentsOf: NSURL.fileURL(withPath: "/Library/Preferences/com.apple.Bluetooth.plist"))
-        if plist != nil {
-            let cache = plist!.object(forKey: "CoreBluetoothCache") as? NSDictionary
-            if cache != nil {
-                let entry = cache!.object(forKey: deviceUuid) as? NSDictionary
-                if entry != nil {
-                    let type = entry!.object(forKey: "DeviceAddressType") as? NSNumber
-                    let addressType:AddressType = type.map { $0.boolValue ? .RANDOM : .PUBLIC } ?? .UNKNOWN
-                    let address = entry!.object(forKey: "DeviceAddress") as? NSString
-                    if (address != nil) {
-                        return (String(address!), addressType)
-                    }
-                }
-            }
-        }
-        return (nil, .UNKNOWN);
-    }
     
     // MARK: Manage Connection
     

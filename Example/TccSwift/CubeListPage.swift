@@ -47,8 +47,8 @@ class CubeListPage: UITableViewController, CubeManagerDelegate {
         if labels.count > 0 {
             if indexPath.row < cubeManager.foundCubeEntries.count {
                 let cube = cubeManager.foundCubeEntries[indexPath.row]
-                labels.first?.text = "\(cube.number) \(cube.name ?? "(no name)")"
-                labels.last?.text = "\(cube.address ?? "(no address)") \(cube.identifierString)"
+                labels.first?.text = "\(cube.name ?? "(no name)")"
+                labels.last?.text = "\(cube.identifierString)"
             }
         }
         return cell
