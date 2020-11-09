@@ -133,7 +133,13 @@
                             <outlet property="delegate" destination="VUD-Ul-Uwq" id="iSg-GK-0fC"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Cube List" id="ffr-9P-5Qx"/>
+                    <navigationItem key="navigationItem" title="Cube List" id="ffr-9P-5Qx">
+                        <barButtonItem key="rightBarButtonItem" systemItem="refresh" id="w3w-Uj-XEl">
+                            <connections>
+                                <action selector="onRefleshButtonPushed:" destination="VUD-Ul-Uwq" id="HRb-DL-qBC"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <segue destination="vXZ-lx-hvc" kind="show" identifier="showCubeControllerPage" id="hSA-PV-HXZ"/>
                     </connections>

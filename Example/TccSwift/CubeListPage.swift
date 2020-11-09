@@ -25,6 +25,12 @@ class CubeListPage: UITableViewController, CubeManagerDelegate {
         cubeManager.stopScan()
     }
     
+    @IBAction func onRefleshButtonPushed(_ sender: Any) {
+        cubeManager.stopScan()
+        cubeManager.startScan()
+        tableView.reloadData()
+    }
+    
     // MARK: CubeManagerDelegate
     
     func cubeManager(_ cubeManager: CubeManager, didCubeFound: Cube) {
