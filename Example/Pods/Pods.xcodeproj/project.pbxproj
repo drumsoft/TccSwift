@@ -15,7 +15,7 @@
 		08DC8A46FE26DFF192FCAC752A66E620 /* CwlMachBadInstructionHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 3049ACFF04304D5A69F83457B0C750D8 /* CwlMachBadInstructionHandler.m */; settings = {COMPILER_FLAGS = "-DPRODUCT_NAME=Nimble/Nimble"; }; };
 		0BC8351182276985B9C97446E9101EF2 /* NMBExceptionCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = 51B84C7FFC08F42191ACE85342E7A391 /* NMBExceptionCapture.m */; settings = {COMPILER_FLAGS = "-DPRODUCT_NAME=Nimble/Nimble"; }; };
 		0D310F96255526460009D2E1 /* Cube.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D310F93255526460009D2E1 /* Cube.swift */; };
-		0D310F97255526460009D2E1 /* Scanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D310F94255526460009D2E1 /* Scanner.swift */; };
+		0D310F97255526460009D2E1 /* CubeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D310F94255526460009D2E1 /* CubeManager.swift */; };
 		0D310F98255526460009D2E1 /* TccError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D310F95255526460009D2E1 /* TccError.swift */; };
 		0D310FA82555264E0009D2E1 /* Id.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D310F9F2555264E0009D2E1 /* Id.swift */; };
 		0D310FA92555264E0009D2E1 /* Sensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D310FA02555264E0009D2E1 /* Sensor.swift */; };
@@ -181,7 +181,7 @@
 		093D1078E5F7D797B22FA30F95A4CD7A /* Pods-TccSwift_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-TccSwift_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		09D153164B47B1F8FD94B8C221767637 /* ExpectationMessage.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpectationMessage.swift; path = Sources/Nimble/ExpectationMessage.swift; sourceTree = "<group>"; };
 		0D310F93255526460009D2E1 /* Cube.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Cube.swift; path = TccSwift/Classes/Cube.swift; sourceTree = "<group>"; };
-		0D310F94255526460009D2E1 /* Scanner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Scanner.swift; path = TccSwift/Classes/Scanner.swift; sourceTree = "<group>"; };
+		0D310F94255526460009D2E1 /* CubeManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CubeManager.swift; path = TccSwift/Classes/CubeManager.swift; sourceTree = "<group>"; };
 		0D310F95255526460009D2E1 /* TccError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TccError.swift; path = TccSwift/Classes/TccError.swift; sourceTree = "<group>"; };
 		0D310F9F2555264E0009D2E1 /* Id.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Id.swift; sourceTree = "<group>"; };
 		0D310FA02555264E0009D2E1 /* Sensor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sensor.swift; sourceTree = "<group>"; };
@@ -650,7 +650,7 @@
 			isa = PBXGroup;
 			children = (
 				0D310F93255526460009D2E1 /* Cube.swift */,
-				0D310F94255526460009D2E1 /* Scanner.swift */,
+				0D310F94255526460009D2E1 /* CubeManager.swift */,
 				0D310F95255526460009D2E1 /* TccError.swift */,
 				0D310F9E2555264E0009D2E1 /* Types */,
 				CD87F3BBDCC78C959623ED60C2B48A6D /* Pod */,
@@ -924,7 +924,7 @@
 				0D310FA82555264E0009D2E1 /* Id.swift in Sources */,
 				B09B234ADA3247D4DBA09D7CA9FE5106 /* TccSwift-dummy.m in Sources */,
 				0D310FAC2555264E0009D2E1 /* Sound.swift in Sources */,
-				0D310F97255526460009D2E1 /* Scanner.swift in Sources */,
+				0D310F97255526460009D2E1 /* CubeManager.swift in Sources */,
 				0D310FAE2555264E0009D2E1 /* Motor.swift in Sources */,
 				0D310FAF2555264E0009D2E1 /* Types.swift in Sources */,
 				0D310F96255526460009D2E1 /* Cube.swift in Sources */,

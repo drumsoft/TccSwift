@@ -8,50 +8,65 @@
 import Foundation
 import CoreBluetooth
 
-internal let SERVICE_Cube = CBUUID(string: "10B20100-5B3B-4571-9508-CF3EFCD7BBAE")
-
-private let CHR_ID = CBUUID(string: "10B20101-5B3B-4571-9508-CF3EFCD7BBAE")
-private let CHR_SENSOR = CBUUID(string: "10B20106-5B3B-4571-9508-CF3EFCD7BBAE")
-private let CHR_BUTTON = CBUUID(string: "10B20107-5B3B-4571-9508-CF3EFCD7BBAE")
-private let CHR_BATTERY = CBUUID(string: "10B20108-5B3B-4571-9508-CF3EFCD7BBAE")
-private let CHR_MOTOR = CBUUID(string: "10B20102-5B3B-4571-9508-CF3EFCD7BBAE")
-private let CHR_LIGHT = CBUUID(string: "10B20103-5B3B-4571-9508-CF3EFCD7BBAE")
-private let CHR_SOUND = CBUUID(string: "10B20104-5B3B-4571-9508-CF3EFCD7BBAE")
-private let CHR_CONFIGURATION = CBUUID(string: "10B201FF-5B3B-4571-9508-CF3EFCD7BBAE")
-
-private let SERVICES = [SERVICE_Cube]
-private let CHARACTERISTICS = [
-    SERVICE_Cube: [CHR_ID, CHR_SENSOR, CHR_BUTTON, CHR_BATTERY, CHR_MOTOR, CHR_LIGHT, CHR_SOUND, CHR_CONFIGURATION],
-]
+/// Delegate to receive unhandled error.
+public protocol CubeDelegate {
+    func cube(_ cube: Cube, didReceivedUnhandled error: Error)
+}
 
 /// Core Cube class
-open class Cube: NSObject, CBPeripheralDelegate {
-    internal let peripheral: CBPeripheral
-    private let scanner: Scanner
+open class Cube {
     
-    /**
-     * Create a new cube instance
-     *
-     * @param peripheral - a noble's peripheral object
-     */
-    init(_ peripheral:CBPeripheral, _ scanner:Scanner) {
+    // MARK: IDs
+    
+    static internal let SERVICE_Cube = CBUUID(string: "10B20100-5B3B-4571-9508-CF3EFCD7BBAE")
+
+    static private let CHR_ID = CBUUID(string: "10B20101-5B3B-4571-9508-CF3EFCD7BBAE")
+    static private let CHR_SENSOR = CBUUID(string: "10B20106-5B3B-4571-9508-CF3EFCD7BBAE")
+    static private let CHR_BUTTON = CBUUID(string: "10B20107-5B3B-4571-9508-CF3EFCD7BBAE")
+    static private let CHR_BATTERY = CBUUID(string: "10B20108-5B3B-4571-9508-CF3EFCD7BBAE")
+    static private let CHR_MOTOR = CBUUID(string: "10B20102-5B3B-4571-9508-CF3EFCD7BBAE")
+    static private let CHR_LIGHT = CBUUID(string: "10B20103-5B3B-4571-9508-CF3EFCD7BBAE")
+    static private let CHR_SOUND = CBUUID(string: "10B20104-5B3B-4571-9508-CF3EFCD7BBAE")
+    static private let CHR_CONFIGURATION = CBUUID(string: "10B201FF-5B3B-4571-9508-CF3EFCD7BBAE")
+
+    static private let SERVICES = [SERVICE_Cube]
+    static private let CHARACTERISTICS = [
+        SERVICE_Cube: [CHR_ID, CHR_SENSOR, CHR_BUTTON, CHR_BATTERY, CHR_MOTOR, CHR_LIGHT, CHR_SOUND, CHR_CONFIGURATION],
+    ]
+    
+    // MARK: Defaults
+
+    public static let CUBE_CONNECTION_TIMEOUT_DEFAULT:TimeInterval = 5
+    
+    // MARK: init
+    
+    internal let peripheral:CBPeripheral
+    private var peripheralDelegate:PeripheralDelegate!
+    
+    internal let manager:CubeManager
+    
+    public var delegate:CubeDelegate?
+    
+    private static var numberCount:Int = 0
+
+    public required init(peripheral:CBPeripheral, manager: CubeManager) {
         self.peripheral = peripheral
-        self.scanner = scanner
+        self.manager = manager
+        self.number = Cube.numberCount
+        Cube.numberCount += 1
     }
     
-    /**
-     * id of cube as a BLE Peripheral
-     */
-    public var id: UUID {
-        return self.peripheral.identifier
-    }
+    // MARK: Identifiers
     
-    /**
-     * address of cube as a BLE Peripheral
-     */
-    public var address: String? {
-        return getAddress(self.peripheral.identifier).address
-    }
+    /// serial number of cube entries
+    public let number:Int
+    /// name for the Cube peripheral
+    open var name:String? { peripheral.name }
+    /// identifier string for the Cube peripheral
+    open var identifierString:String { peripheral.identifier.uuidString }
+    
+    /// address of cube as a BLE Peripheral
+    open var address: String? { getAddress(self.peripheral.identifier).address }
     
     private enum AddressType {
         case PUBLIC
@@ -81,125 +96,181 @@ open class Cube: NSObject, CBPeripheralDelegate {
         return (nil, .UNKNOWN);
     }
     
-    // MARK: Connection
-
-    /**
-     * Connect to the cube
-     */
-    public func connect(_ callback: @escaping (Result<Cube,Error>)->()) {
-        connectionCallback = callback
-        scanner.connectForCube(self)
-    }
+    // MARK: Manage Connection
     
-    /// disconnect the cube.
-    public func disconnect() {
-        scanner.disconnectForCube(self)
-    }
-
-    // MARK: Connection Callbacks
-
     private var connectionCallback:((Result<Cube,Error>)->())?
+    private var connectionTimer:Timer?
     
-    private func connectionSucceeded() {
-        connectionCallback?(Result.success(self))
-        connectionCallback = nil
+    /// Connect to Cube
+    ///
+    /// - Parameters:
+    ///   - timeout: Timeout in seconds.
+    ///   - callback: callback for connection.
+    open func connect(timeout:TimeInterval = CUBE_CONNECTION_TIMEOUT_DEFAULT, callback: @escaping (Result<Cube,Error>)->()) {
+        connectionCallback = callback
+        connectionTimer = Timer.scheduledTimer(withTimeInterval: timeout, repeats: false) { _ in
+            self.manager.disconnectFromCube(self)
+            self.onConnectionFailed(TccError.connectionTimeouted)
+        }
+        manager.connectFromCube(self)
     }
     
-    private func connectionFailed(_ error: Error?) {
-        connectionCallback?(Result.failure(error ?? TccError.connectionFailedWithNoReason))
-        connectionCallback = nil
+    /// disconnect from Cube
+    /// if disconnected while connection, connection callback will receive TccError.disconnectedWhileConnection error.
+    open func disconnect() {
+        manager.disconnectFromCube(self)
+        connectionTimer?.invalidate()
+        connectionTimer = nil
+        if let cb = connectionCallback {
+            connectionCallback = nil
+            cb(Result.failure(TccError.disconnectedWhileConnection))
+        }
     }
     
-    /// Connection callback when connected.
     internal func onConnected() {
-        peripheral.delegate = self
-        peripheral.discoverServices(SERVICES)
+        connectionTimer?.invalidate()
+        connectionTimer = nil
+        
+        peripheralDelegate = PeripheralDelegate(cube:self)
+        peripheral.delegate = peripheralDelegate
+        peripheral.discoverServices(Cube.SERVICES)
     }
     
-    /// Connection callback when connection failed.
-    internal func onConnectionFailed(_ error: Error?) {
-        connectionFailed(error)
+    internal func onConnectionFailed(_ error:Error) {
+        connectionTimer?.invalidate()
+        connectionTimer = nil
+        if let cb = connectionCallback {
+            connectionCallback = nil
+            cb(Result.failure(error))
+        }
     }
     
-    /// Connection callback when connection disconnected.
-    internal func onDisconnected(_ error: Error?) {
-        connectionFailed(error)
+    internal func onDisconnected(_ error:Error?) {
+        connectionTimer?.invalidate()
+        connectionTimer = nil
+        if let cb = connectionCallback {
+            connectionCallback = nil
+            cb(Result.failure(error ?? TccError.disconnectedWhileConnection))
+        }
+    }
+    
+    internal func onConnectionSucceeded() {
+        if let cb = connectionCallback {
+            connectionCallback = nil
+            cb(Result.success(self))
+        }
     }
     
     // MARK: Services, Characteristics
     
     private var characteristics:[CBUUID:CBCharacteristic] = [:]
-
-    /// Services を検出 -> Characteristics を検索
-    public func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
-        guard error == nil else {
-            connectionFailed(error)
-            self.disconnect()
-            return
+    
+    private class PeripheralDelegate: NSObject, CBPeripheralDelegate {
+        let cube:Cube
+        
+        required init(cube:Cube) {
+            self.cube = cube
         }
-        guard peripheral.services != nil && (SERVICES.allSatisfy{ serviceUUID in peripheral.services!.contains{ $0.uuid == serviceUUID } }) else {
-            connectionFailed(TccError.requiredServiceNotFound)
-            self.disconnect()
-            return
+        
+        /// Services を検出 -> Characteristics を検索
+        public func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
+            guard error == nil else {
+                cube.onConnectionFailed(error!)
+                cube.disconnect()
+                return
+            }
+            guard peripheral.services != nil && (SERVICES.allSatisfy{ serviceUUID in peripheral.services!.contains{ $0.uuid == serviceUUID } }) else {
+                cube.onConnectionFailed(TccError.requiredServiceNotFound)
+                cube.disconnect()
+                return
+            }
+            for service in peripheral.services! {
+                peripheral.discoverCharacteristics(CHARACTERISTICS[service.uuid], for: service)
+            }
         }
-        for service in peripheral.services! {
-            peripheral.discoverCharacteristics(CHARACTERISTICS[service.uuid], for: service)
+        
+        /// Characteristics を検出 -> 接続完了にする
+        public func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+            guard error == nil else {
+                cube.onConnectionFailed(error!)
+                cube.disconnect()
+                return
+            }
+            for characteristic in service.characteristics! {
+                cube.characteristics[characteristic.uuid] = characteristic
+            }
+            cube.onConnectionSucceeded()
+        }
+        
+        /// "Notify" result callback
+        public func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
+            // characteristic.isNotifying ? notify subscribed : canceled.
+        }
+        
+        /// "Read" or "Notify" callback
+        public func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+            cube.didUpdateValueFor(characteristic: characteristic, error: error)
+        }
+        
+        /// "Writre" callback
+        public func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
+            cube.didWriteValueFor(characteristic: characteristic, error: error)
         }
     }
     
-    /// Characteristics を検出 -> 接続完了にする
-    public func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
-        guard error == nil else {
-            connectionFailed(error)
-            self.disconnect()
-            return
-        }
-        for characteristic in service.characteristics! {
-            characteristics[characteristic.uuid] = characteristic
-        }
-        connectionSucceeded()
-    }
-    
-    /// "Notify" result callback
-    public func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
-        // characteristic.isNotifying ? notify subscribed : canceled.
-    }
-    
-    /// "Read" or "Notify" callback
-    public func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+    private func didUpdateNotificationStateFor(characteristic: CBCharacteristic, error: Error?) {
         let chr_id = characteristic.uuid
-        // check if read or notify waiting exists
-        guard (readWaiting[chr_id] != nil && readWaiting[chr_id]!.count > 0) ||
-                (notifyWaiting[chr_id] != nil && notifyWaiting[chr_id]!.count > 0) else {
-            return
+        if error != nil {
+            if notifyWaiting[chr_id] != nil && notifyWaiting[chr_id]!.count > 0 {
+                for waiting in notifyWaiting[chr_id]! {
+                    callbackResult(nil, error!, to: waiting, for: chr_id)
+                }
+            } else {
+                didReceivedUnhandledError(error!)
+            }
         }
+    }
+    
+    private func didUpdateValueFor(characteristic: CBCharacteristic, error: Error?) {
+        let chr_id = characteristic.uuid
+        var callbacked = false
         // parse value
         let result = parseData(characteristic.value, for: chr_id)
         // read callbacks
-        if readWaiting[chr_id] != nil {
+        if readWaiting[chr_id] != nil && readWaiting[chr_id]!.count > 0 {
             while readWaiting[chr_id]!.count > 0 {
-                callbackResult(result, to: readWaiting[chr_id]!.removeFirst(), for: chr_id)
+                callbackResult(result, error, to: readWaiting[chr_id]!.removeFirst(), for: chr_id)
             }
+            callbacked = true
         }
         // notify callbacks
-        if notifyWaiting[chr_id] != nil {
+        if notifyWaiting[chr_id] != nil && notifyWaiting[chr_id]!.count > 0 {
             for waiting in notifyWaiting[chr_id]! {
-                callbackResult(result, to: waiting, for: chr_id)
+                callbackResult(result, error, to: waiting, for: chr_id)
             }
+            callbacked = true
+        }
+        // unhandled error
+        if !callbacked && error != nil {
+            didReceivedUnhandledError(error!)
         }
     }
     
-    /// "Writre" callback
-    public func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
+    private func didWriteValueFor(characteristic: CBCharacteristic, error: Error?) {
         let chr_id = characteristic.uuid
         if writeWaiting[chr_id] != nil && writeWaiting[chr_id]!.count > 0 {
-            let result = error == nil ? Result.success(Succeeded()) : Result.failure(error!)
             while writeWaiting[chr_id]!.count > 0 {
-                (writeWaiting[chr_id]!.removeFirst() as? Waiting<Succeeded>)?.callback(result)
+                callbackResult(error == nil ? Succeeded() : nil, error, to: writeWaiting[chr_id]!.removeFirst(), for: chr_id)
             }
+        } else if error != nil {
+            didReceivedUnhandledError(error!)
         }
     }
     
+    private func didReceivedUnhandledError(_ error:Error) {
+        delegate?.cube(self, didReceivedUnhandled: error)
+    }
+
     // MARK: parse value and manage callbacks
     
     private func parseData(_ data:Data?, for chr_id:CBUUID) -> TccResponse? {
@@ -207,17 +278,17 @@ open class Cube: NSObject, CBPeripheralDelegate {
             return nil
         }
         switch chr_id {
-        case CHR_ID:
+        case Cube.CHR_ID:
             return IdResponse.parse(data!)
-        case CHR_SENSOR:
+        case Cube.CHR_SENSOR:
             return SensorResponse.parse(data!)
-        case CHR_BUTTON:
+        case Cube.CHR_BUTTON:
             return ButtonResponse.parse(data!)
-        case CHR_BATTERY:
+        case Cube.CHR_BATTERY:
             return BatteryResponse.parse(data!)
-        case CHR_MOTOR:
+        case Cube.CHR_MOTOR:
             return MotorResponse.parse(data!)
-        case CHR_CONFIGURATION:
+        case Cube.CHR_CONFIGURATION:
             return ConfigurationResponse.parse(data!)
         default:
             return nil
@@ -244,27 +315,31 @@ open class Cube: NSObject, CBPeripheralDelegate {
     private var readWaiting:[CBUUID:[Any]] = [:]
     private var notifyWaiting:[CBUUID:[Any]] = [:]
     private var writeWaiting:[CBUUID:[Any]] = [:]
-
-    private func callbackResult(_ result:TccResponse?, to waiting:Any, for chr_id:CBUUID) {
+    
+    private func callbackResult(_ result:TccResponse? = nil, _ error:Error? = nil, to waiting:Any, for chr_id:CBUUID) {
         switch chr_id {
-        case CHR_ID:
-            callbackFor(result: result, to: waiting as! Waiting<IdResponse>)
-        case CHR_SENSOR:
-            callbackFor(result: result, to: waiting as! Waiting<SensorResponse>)
-        case CHR_BUTTON:
-            callbackFor(result: result, to: waiting as! Waiting<ButtonResponse>)
-        case CHR_BATTERY:
-            callbackFor(result: result, to: waiting as! Waiting<BatteryResponse>)
-        case CHR_MOTOR:
-            callbackFor(result: result, to: waiting as! Waiting<MotorResponse>)
-        case CHR_CONFIGURATION:
-            callbackFor(result: result, to: waiting as! Waiting<ConfigurationResponse>)
+        case Cube.CHR_ID:
+            callbackFor(result: result, error: error, to: waiting as! Waiting<IdResponse>)
+        case Cube.CHR_SENSOR:
+            callbackFor(result: result, error: error, to: waiting as! Waiting<SensorResponse>)
+        case Cube.CHR_BUTTON:
+            callbackFor(result: result, error: error, to: waiting as! Waiting<ButtonResponse>)
+        case Cube.CHR_BATTERY:
+            callbackFor(result: result, error: error, to: waiting as! Waiting<BatteryResponse>)
+        case Cube.CHR_MOTOR:
+            callbackFor(result: result, error: error, to: waiting as! Waiting<MotorResponse>)
+        case Cube.CHR_CONFIGURATION:
+            callbackFor(result: result, error: error, to: waiting as! Waiting<ConfigurationResponse>)
         default:
             break
         }
     }
     
-    private func callbackFor<ResultType:TccResponse>(result:TccResponse?, to waiting:Waiting<ResultType>) {
+    private func callbackFor<ResultType:TccResponse>(result:TccResponse?, error:Error?, to waiting:Waiting<ResultType>) {
+        if error != nil {
+            waiting.callback(Result.failure(error!))
+            return
+        }
         guard result != nil else {
             waiting.callback(Result.failure(TccError.resultParseFailed))
             return
@@ -345,7 +420,7 @@ open class Cube: NSObject, CBPeripheralDelegate {
     /// - Parameters:
     ///   - callback: callback when value read.
     open func readId(_ callback: @escaping (Result<IdResponse,Error>)->()) {
-        readCharacteristic(CHR_ID, callback)
+        readCharacteristic(Cube.CHR_ID, callback)
     }
     
     /// Start notify ID (Position ID, Standard ID) from the Cube
@@ -355,7 +430,7 @@ open class Cube: NSObject, CBPeripheralDelegate {
     ///
     /// - Returns:    the notification id.
     open func startNotifyId(_ callback: @escaping (Result<IdResponse,Error>)->()) -> UInt {
-        return startNotifyCharacteristic(CHR_ID, callback)
+        return startNotifyCharacteristic(Cube.CHR_ID, callback)
     }
     
     /// Stop notify ID (Position ID, Standard ID) from the Cube
@@ -363,7 +438,7 @@ open class Cube: NSObject, CBPeripheralDelegate {
     /// - Parameters:
     ///   - id:     the notification id.
     open func stopNotifyId(_ id: UInt) {
-        stopNotifyCharacteristic(CHR_ID, id)
+        stopNotifyCharacteristic(Cube.CHR_ID, id)
     }
     
     // MARK: Sensor (Write, Read, Notify) CHR_SENSOR
@@ -373,7 +448,7 @@ open class Cube: NSObject, CBPeripheralDelegate {
     /// - Parameters:
     ///   - callback: callback when value read.
     open func readSensor(_ callback: @escaping (Result<SensorResponse,Error>)->()) {
-        readCharacteristic(CHR_SENSOR, callback)
+        readCharacteristic(Cube.CHR_SENSOR, callback)
     }
     
     /// Start notify Sensor values (Motion, Magnetic) from the Cube
@@ -383,7 +458,7 @@ open class Cube: NSObject, CBPeripheralDelegate {
     ///
     /// - Returns:    the notification id.
     open func startNotifySensor(_ callback: @escaping (Result<SensorResponse,Error>)->()) -> UInt {
-        return startNotifyCharacteristic(CHR_SENSOR, callback)
+        return startNotifyCharacteristic(Cube.CHR_SENSOR, callback)
     }
     
     /// Stop notify Sensor values (Motion, Magnetic) from the Cube
@@ -391,25 +466,25 @@ open class Cube: NSObject, CBPeripheralDelegate {
     /// - Parameters:
     ///   - id:     the notification id.
     open func stopNotifySensor(_ id: UInt) {
-        stopNotifyCharacteristic(CHR_SENSOR, id)
+        stopNotifyCharacteristic(Cube.CHR_SENSOR, id)
     }
     
     /// Request Motion Sensor Notification
     ///
     /// - Parameters:
     ///   - callback: callback after write succeeded.
-    open func writeRequestMotionSensorValues(callback:((Result<Succeeded,Error>)->())?) {
+    open func writeRequestMotionSensorValues(callback:((Result<Succeeded,Error>)->())? = nil) {
         let data = SensorRequestMotionRequest().data
-        writeCharacteristic(CHR_SENSOR, data: data, callback)
+        writeCharacteristic(Cube.CHR_SENSOR, data: data, callback)
     }
     
     /// Request Magnetic Sensor Notification
     ///
     /// - Parameters:
     ///   - callback: callback after write succeeded.
-    open func writeRequestMagneticSensorValues(callback:((Result<Succeeded,Error>)->())?) {
+    open func writeRequestMagneticSensorValues(callback:((Result<Succeeded,Error>)->())? = nil) {
         let data = SensorRequestMagneticRequest().data
-        writeCharacteristic(CHR_SENSOR, data: data, callback)
+        writeCharacteristic(Cube.CHR_SENSOR, data: data, callback)
     }
     
     // MARK: Button (Read, Notify): Bool CHR_BUTTON
@@ -419,7 +494,7 @@ open class Cube: NSObject, CBPeripheralDelegate {
     /// - Parameters:
     ///   - callback: callback when value read.
     open func readButton(_ callback: @escaping (Result<ButtonResponse,Error>)->()) {
-        readCharacteristic(CHR_BUTTON, callback)
+        readCharacteristic(Cube.CHR_BUTTON, callback)
     }
     
     /// Start notify Button values (Motion, Magnetic) from the Cube
@@ -429,7 +504,7 @@ open class Cube: NSObject, CBPeripheralDelegate {
     ///
     /// - Returns:    the notification id.
     open func startNotifyButton(_ callback: @escaping (Result<ButtonResponse,Error>)->()) -> UInt {
-        return startNotifyCharacteristic(CHR_BUTTON, callback)
+        return startNotifyCharacteristic(Cube.CHR_BUTTON, callback)
     }
     
     /// Stop notify Button values (Motion, Magnetic) from the Cube
@@ -437,7 +512,7 @@ open class Cube: NSObject, CBPeripheralDelegate {
     /// - Parameters:
     ///   - id:     the notification id.
     open func stopNotifyButton(_ id: UInt) {
-        stopNotifyCharacteristic(CHR_BUTTON, id)
+        stopNotifyCharacteristic(Cube.CHR_BUTTON, id)
     }
 
     // MARK: Battery (Read, Notify): Int (0...100) CHR_BATTERY
@@ -447,7 +522,7 @@ open class Cube: NSObject, CBPeripheralDelegate {
     /// - Parameters:
     ///   - callback: callback when value read.
     open func readBattery(_ callback: @escaping (Result<BatteryResponse,Error>)->()) {
-        readCharacteristic(CHR_BATTERY, callback)
+        readCharacteristic(Cube.CHR_BATTERY, callback)
     }
     
     /// Start notify Battery values (Motion, Magnetic) from the Cube
@@ -457,7 +532,7 @@ open class Cube: NSObject, CBPeripheralDelegate {
     ///
     /// - Returns:    the notification id.
     open func startNotifyBattery(_ callback: @escaping (Result<BatteryResponse,Error>)->()) -> UInt {
-        return startNotifyCharacteristic(CHR_BATTERY, callback)
+        return startNotifyCharacteristic(Cube.CHR_BATTERY, callback)
     }
     
     /// Stop notify Battery values (Motion, Magnetic) from the Cube
@@ -465,7 +540,7 @@ open class Cube: NSObject, CBPeripheralDelegate {
     /// - Parameters:
     ///   - id:     the notification id.
     open func stopNotifyBattery(_ id: UInt) {
-        stopNotifyCharacteristic(CHR_BATTERY, id)
+        stopNotifyCharacteristic(Cube.CHR_BATTERY, id)
     }
 
     // MARK: Motor (Write without response, Read, Notify) CHR_MOTOR
@@ -475,7 +550,7 @@ open class Cube: NSObject, CBPeripheralDelegate {
     /// - Parameters:
     ///   - callback: callback when value read.
     open func readMotor(_ callback: @escaping (Result<MotorResponse,Error>)->()) {
-        readCharacteristic(CHR_MOTOR, callback)
+        readCharacteristic(Cube.CHR_MOTOR, callback)
     }
     
     /// Start notify Motor values (Motion, Magnetic) from the Cube
@@ -485,7 +560,7 @@ open class Cube: NSObject, CBPeripheralDelegate {
     ///
     /// - Returns:    the notification id.
     open func startNotifyMotor(_ callback: @escaping (Result<MotorResponse,Error>)->()) -> UInt {
-        return startNotifyCharacteristic(CHR_MOTOR, callback)
+        return startNotifyCharacteristic(Cube.CHR_MOTOR, callback)
     }
     
     /// Stop notify Motor values (Motion, Magnetic) from the Cube
@@ -493,7 +568,7 @@ open class Cube: NSObject, CBPeripheralDelegate {
     /// - Parameters:
     ///   - id:     the notification id.
     open func stopNotifyMotor(_ id: UInt) {
-        stopNotifyCharacteristic(CHR_MOTOR, id)
+        stopNotifyCharacteristic(Cube.CHR_MOTOR, id)
     }
     
     /// Activate Motors.
@@ -501,10 +576,9 @@ open class Cube: NSObject, CBPeripheralDelegate {
     /// - Parameters:
     ///   - left:       left motor velocity. 0 to 7: stop, 8 to 115 go forward (34 to 494 rpm), go backward with negative value.
     ///   - right:      right motor velocity. 0 to 7: stop, 8 to 115 go forward (34 to 494 rpm), go backward with negative value.
-    ///   - callback:   callback after write succeeded.
-    open func writeActivateMotor(left: Int, right: Int, callback:((Result<Succeeded,Error>)->())?) {
+    open func writeActivateMotor(left: Int, right: Int) {
         let data = MotorActivateRequest(left: left, right: right).data
-        writeCharacteristic(CHR_MOTOR, data: data, callback)
+        writeCharacteristic(Cube.CHR_MOTOR, data: data, nil)
     }
     
     /// Activate Motors with duration.
@@ -513,10 +587,9 @@ open class Cube: NSObject, CBPeripheralDelegate {
     ///   - left:       left motor velocity. 0 to 7: stop, 8 to 115 go forward (34 to 494 rpm), go backward with negative value.
     ///   - right:      right motor velocity. 0 to 7: stop, 8 to 115 go forward (34 to 494 rpm), go backward with negative value.
     ///   - duration:   duration to activate motors. 0.01 to 2.55 seconds. 0 means infinite.
-    ///   - callback:   callback after write succeeded.
-    open func writeActivateMotor(left: Int, right: Int, duration:TimeInterval, callback:((Result<Succeeded,Error>)->())?) {
+    open func writeActivateMotor(left: Int, right: Int, duration:TimeInterval) {
         let data = MotorActivateWithDurationRequest(left: left, right: right, duration: duration).data
-        writeCharacteristic(CHR_MOTOR, data: data, callback)
+        writeCharacteristic(Cube.CHR_MOTOR, data: data, nil)
     }
     
     /// Move To Destination.
@@ -532,10 +605,9 @@ open class Cube: NSObject, CBPeripheralDelegate {
     ///   - destinationY:       destination position Y in Position ID.
     ///   - finalRotation:      final Cube's rotation. value. meaning of this value depends on the finalRotationType.
     ///   - finalRotationType:  final Cube's rotation type.
-    ///   - callback:           callback after write succeeded.
-    open func writeMoveToDestination(id: Int, timeout: TimeInterval, curve: MotorDestinationCurve, maxVelocity: Int, easing: MotorDestinationEasing, destinationX: Int, destinationY: Int, finalRotation: Int, finalRotationType: MotorDestinationFinalRotation, callback:((Result<Succeeded,Error>)->())?) {
+    open func writeMoveToDestination(id: Int, timeout: TimeInterval, curve: MotorDestinationCurve, maxVelocity: Int, easing: MotorDestinationEasing, destinationX: Int, destinationY: Int, finalRotation: Int, finalRotationType: MotorDestinationFinalRotation) {
         let data = MotorMoveToDestinationRequest(id: id, timeout: timeout, curve: curve, maxVelocity: maxVelocity, easing: easing, destination: MotorDestinationUnit(destinationX: destinationX, destinationY: destinationY, finalRotation: finalRotation, finalRotationType: finalRotationType)).data
-        writeCharacteristic(CHR_MOTOR, data: data, callback)
+        writeCharacteristic(Cube.CHR_MOTOR, data: data, nil)
     }
     
     /// Move To Multiple Destination.
@@ -550,9 +622,9 @@ open class Cube: NSObject, CBPeripheralDelegate {
     ///   - writeMode:      overwrite to current moving or append.
     ///   - destinations:   list of destinations
     ///   - callback:       callback after write succeeded.
-    open func writeMoveToMultipleDestination(id: Int, timeout: TimeInterval, curve: MotorDestinationCurve, maxVelocity: Int, easing: MotorDestinationEasing, writeMode: MotorDestinationWriteMode, destinations: [MotorDestinationUnit], callback:((Result<Succeeded,Error>)->())?) {
+    open func writeMoveToMultipleDestination(id: Int, timeout: TimeInterval, curve: MotorDestinationCurve, maxVelocity: Int, easing: MotorDestinationEasing, writeMode: MotorDestinationWriteMode, destinations: [MotorDestinationUnit]) {
         let data = MotorMoveToMultipleDestinationRequest(id: id, timeout: timeout, curve: curve, maxVelocity: maxVelocity, easing: easing, writeMode: writeMode, destinations: destinations).data
-        writeCharacteristic(CHR_MOTOR, data: data, callback)
+        writeCharacteristic(Cube.CHR_MOTOR, data: data, nil)
     }
     
     /// Move with accelarated velocity.
@@ -565,9 +637,9 @@ open class Cube: NSObject, CBPeripheralDelegate {
     ///   - priority:           Set priority to keep velocity or angularVelocity .
     ///   - duration:           0.01 to 2.55 seconds. 0 means infinite.
     ///   - callback:           callback after write succeeded.
-    open func writeMoveToMultipleDestination(velocity: Int, acceralation: Int, angularVelocity: Int, priority: MotorAcceralationPriority, duration: TimeInterval, callback:((Result<Succeeded,Error>)->())?) {
+    open func writeMoveToMultipleDestination(velocity: Int, acceralation: Int, angularVelocity: Int, priority: MotorAcceralationPriority, duration: TimeInterval) {
         let data = MotorMoveWithAcceralationRequest(velocity: velocity, acceralation: acceralation, angularVelocity: angularVelocity, priority: priority, duration: duration).data
-        writeCharacteristic(CHR_MOTOR, data: data, callback)
+        writeCharacteristic(Cube.CHR_MOTOR, data: data, nil)
     }
 
     // MARK: Light (Write) CHR_LIGHT
@@ -580,9 +652,9 @@ open class Cube: NSObject, CBPeripheralDelegate {
     ///   - green:    color green value 0.0 to 1.0
     ///   - blue:     color blue value 0.0 to 1.0
     ///   - callback: callback after write succeeded.
-    open func writeLightOn(duration:TimeInterval, red:Double, green:Double, blue:Double, callback:((Result<Succeeded,Error>)->())?) {
+    open func writeLightOn(duration:TimeInterval, red:Double, green:Double, blue:Double, callback:((Result<Succeeded,Error>)->())? = nil) {
         let data = LightOnRequest(unit:LightOnUnit(duration: duration, red: red, green: green, blue: blue)).data
-        writeCharacteristic(CHR_LIGHT, data: data, callback)
+        writeCharacteristic(Cube.CHR_LIGHT, data: data, callback)
     }
     
     /// Turn on (and off) the light in sequence.
@@ -591,17 +663,17 @@ open class Cube: NSObject, CBPeripheralDelegate {
     ///   - repeats:    repeat sequence as loop. 0 means infinite loop.
     ///   - sequence:   sequence of light controls.
     ///   - callback:   callback after write succeeded.
-    open func writeLightSequence(repeats: Int, sequence:[LightOnUnit], callback:((Result<Succeeded,Error>)->())?) {
+    open func writeLightSequence(repeats: Int, sequence:[LightOnUnit], callback:((Result<Succeeded,Error>)->())? = nil) {
         let data = LightOnSequenceRequest(repeats: repeats, sequence: sequence).data
-        writeCharacteristic(CHR_LIGHT, data: data, callback)
+        writeCharacteristic(Cube.CHR_LIGHT, data: data, callback)
     }
 
     /// Turn off all light.
     ///
     /// - Parameters:
     ///   - callback: callback after write succeeded.
-    open func writeLightAllOff(callback:((Result<Succeeded,Error>)->())?) {
-        writeCharacteristic(CHR_LIGHT, data: LightAllOffRequest().data, callback)
+    open func writeLightAllOff(callback:((Result<Succeeded,Error>)->())? = nil) {
+        writeCharacteristic(Cube.CHR_LIGHT, data: LightAllOffRequest().data, callback)
     }
     
     // MARK: Sound (Write) CHR_SOUND
@@ -612,9 +684,9 @@ open class Cube: NSObject, CBPeripheralDelegate {
     ///   - se:         select sound effect.
     ///   - volume:     0 means mute, 1 to 255 means max volume.
     ///   - callback:   callback after write succeeded.
-    open func writeSoundPlay(se:SoundEffect, volume:Double, callback:((Result<Succeeded,Error>)->())?) {
+    open func writeSoundPlay(se:SoundEffect, volume:Double, callback:((Result<Succeeded,Error>)->())? = nil) {
         let data = SoundPlayRequest(se: se, volume: volume).data
-        writeCharacteristic(CHR_SOUND, data: data, callback)
+        writeCharacteristic(Cube.CHR_SOUND, data: data, callback)
     }
     
     /// Play notes.
@@ -628,17 +700,17 @@ open class Cube: NSObject, CBPeripheralDelegate {
     ///   - duration:   0.01 to 2.55 seconds.
     ///   - note:   0 to 127, 57 = A4 440Hz, 128 = mute
     ///   - volume:     0 means mute, 1 to 255 means max volume.
-    open func writeSoundPlayNotes(repeats: Int, sequence:[SoundNoteUnit], callback:((Result<Succeeded,Error>)->())?) {
+    open func writeSoundPlayNotes(repeats: Int, sequence:[SoundNoteUnit], callback:((Result<Succeeded,Error>)->())? = nil) {
         let data = SoundPlayNotesRequest(repeats: repeats, sequence: sequence).data
-        writeCharacteristic(CHR_SOUND, data: data, callback)
+        writeCharacteristic(Cube.CHR_SOUND, data: data, callback)
     }
 
     /// Stop playing sound.
     ///
     /// - Parameters:
     ///   - callback: callback after write succeeded.
-    open func writeSoundStop(callback:((Result<Succeeded,Error>)->())?) {
-        writeCharacteristic(CHR_SOUND, data: SoundStopRequest().data, callback)
+    open func writeSoundStop(callback:((Result<Succeeded,Error>)->())? = nil) {
+        writeCharacteristic(Cube.CHR_SOUND, data: SoundStopRequest().data, callback)
     }
 
     // MARK: Configuration (Write, Read, Notify) CHR_CONFIGURATION
@@ -648,7 +720,7 @@ open class Cube: NSObject, CBPeripheralDelegate {
     /// - Parameters:
     ///   - callback: callback when value read.
     open func readConfiguration(_ callback: @escaping (Result<ConfigurationResponse,Error>)->()) {
-        readCharacteristic(CHR_CONFIGURATION, callback)
+        readCharacteristic(Cube.CHR_CONFIGURATION, callback)
     }
     
     /// Start notify Configuration values (Motion, Magnetic) from the Cube
@@ -658,7 +730,7 @@ open class Cube: NSObject, CBPeripheralDelegate {
     ///
     /// - Returns:    the notification id.
     open func startNotifyConfiguration(_ callback: @escaping (Result<ConfigurationResponse,Error>)->()) -> UInt {
-        return startNotifyCharacteristic(CHR_CONFIGURATION, callback)
+        return startNotifyCharacteristic(Cube.CHR_CONFIGURATION, callback)
     }
     
     /// Stop notify Configuration values (Motion, Magnetic) from the Cube
@@ -666,15 +738,15 @@ open class Cube: NSObject, CBPeripheralDelegate {
     /// - Parameters:
     ///   - id:     the notification id.
     open func stopNotifyConfiguration(_ id: UInt) {
-        stopNotifyCharacteristic(CHR_CONFIGURATION, id)
+        stopNotifyCharacteristic(Cube.CHR_CONFIGURATION, id)
     }
     
     /// Configuration: request BLE Protocol Version.
     ///
     /// - Parameters:
     ///   - callback: callback after write succeeded.
-    open func writeConfigurationRequestBLEProtocolVersion(callback:((Result<Succeeded,Error>)->())?) {
-        writeCharacteristic(CHR_CONFIGURATION, data: ConfigurationRequestBLEProtocolVersionRequest().data, callback)
+    open func writeConfigurationRequestBLEProtocolVersion(callback:((Result<Succeeded,Error>)->())? = nil) {
+        writeCharacteristic(Cube.CHR_CONFIGURATION, data: ConfigurationRequestBLEProtocolVersionRequest().data, callback)
     }
     
     /// Configuration: Motion sensor's "level" threshold.
@@ -682,9 +754,9 @@ open class Cube: NSObject, CBPeripheralDelegate {
     /// - Parameters:
     ///   - value:      level threshold in degree 1 to 45.
     ///   - callback:   callback after write succeeded.
-    open func writeConfigurationSensorLevelThreshold(value: Int, callback:((Result<Succeeded,Error>)->())?) {
+    open func writeConfigurationSensorLevelThreshold(value: Int, callback:((Result<Succeeded,Error>)->())? = nil) {
         let data = ConfigurationSensorLevelThresholdRequest(value: value).data
-        writeCharacteristic(CHR_CONFIGURATION, data: data, callback)
+        writeCharacteristic(Cube.CHR_CONFIGURATION, data: data, callback)
     }
 
     /// Configuration: Motion sensor's collision threshold.
@@ -692,9 +764,9 @@ open class Cube: NSObject, CBPeripheralDelegate {
     /// - Parameters:
     ///   - value:      collision threshold in 1 to 10 collision level.
     ///   - callback:   callback after write succeeded.
-    open func writeConfigurationSensorCollisionThreshold(value: Int, callback:((Result<Succeeded,Error>)->())?) {
+    open func writeConfigurationSensorCollisionThreshold(value: Int, callback:((Result<Succeeded,Error>)->())? = nil) {
         let data = ConfigurationSensorCollisionThresholdRequest(value: value).data
-        writeCharacteristic(CHR_CONFIGURATION, data: data, callback)
+        writeCharacteristic(Cube.CHR_CONFIGURATION, data: data, callback)
     }
 
     /// Configuration: Motion sensor's double tap interval limit.
@@ -702,9 +774,9 @@ open class Cube: NSObject, CBPeripheralDelegate {
     /// - Parameters:
     ///   - value:      double tap interval limit in 0 to 7 level.
     ///   - callback:   callback after write succeeded.
-    open func writeConfigurationSensorDoubleTapInterval(value: Int, callback:((Result<Succeeded,Error>)->())?) {
+    open func writeConfigurationSensorDoubleTapInterval(value: Int, callback:((Result<Succeeded,Error>)->())? = nil) {
         let data = ConfigurationSensorDoubleTapIntervalRequest(value: value).data
-        writeCharacteristic(CHR_CONFIGURATION, data: data, callback)
+        writeCharacteristic(Cube.CHR_CONFIGURATION, data: data, callback)
     }
 
     /// Configuration: ID (Position ID, Standard ID) notification frequency.
@@ -713,9 +785,9 @@ open class Cube: NSObject, CBPeripheralDelegate {
     ///   - interval:   minimum notify interval in 0.00 to 2.55 seconds.
     ///   - condition:  condition to notify.
     ///   - callback:   callback after write succeeded.
-    open func writeConfigurationSensorIdFrequency(interval: TimeInterval, condition: ConfigurationSensorIdNotifyCondition, callback:((Result<Succeeded,Error>)->())?) {
+    open func writeConfigurationSensorIdFrequency(interval: TimeInterval, condition: ConfigurationSensorIdNotifyCondition, callback:((Result<Succeeded,Error>)->())? = nil) {
         let data = ConfigurationSensorIdFrequencyRequest(interval: interval, condition: condition).data
-        writeCharacteristic(CHR_CONFIGURATION, data: data, callback)
+        writeCharacteristic(Cube.CHR_CONFIGURATION, data: data, callback)
     }
 
     /// Configuration: threshold time to determined as "ID missed".
@@ -723,9 +795,9 @@ open class Cube: NSObject, CBPeripheralDelegate {
     /// - Parameters:
     ///   - value:      threshold time to determined as "ID missed" in 0.00 to 2.55 seconds.
     ///   - callback:   callback after write succeeded.
-    open func writeConfigurationSensorIdMissedThreshold(value: TimeInterval, callback:((Result<Succeeded,Error>)->())?) {
+    open func writeConfigurationSensorIdMissedThreshold(value: TimeInterval, callback:((Result<Succeeded,Error>)->())? = nil) {
         let data = ConfigurationSensorIdMissedThresholdRequest(value: value).data
-        writeCharacteristic(CHR_CONFIGURATION, data: data, callback)
+        writeCharacteristic(Cube.CHR_CONFIGURATION, data: data, callback)
     }
 
     /// Configuration: Magnetic sensor availability.
@@ -733,9 +805,9 @@ open class Cube: NSObject, CBPeripheralDelegate {
     /// - Parameters:
     ///   - value:      availability.
     ///   - callback:   callback after write succeeded.
-    open func writeConfigurationSensorMagneticAvailability(value: Bool, callback:((Result<Succeeded,Error>)->())?) {
+    open func writeConfigurationSensorMagneticAvailability(value: Bool, callback:((Result<Succeeded,Error>)->())? = nil) {
         let data = ConfigurationSensorMagneticAvailabilityRequest(value: value).data
-        writeCharacteristic(CHR_CONFIGURATION, data: data, callback)
+        writeCharacteristic(Cube.CHR_CONFIGURATION, data: data, callback)
     }
 
     /// Configuration: Velocity values availability.
@@ -743,8 +815,8 @@ open class Cube: NSObject, CBPeripheralDelegate {
     /// - Parameters:
     ///   - value:      availability.
     ///   - callback:   callback after write succeeded.
-    open func writeConfigurationMotorVelocityAvailability(value: Bool, callback:((Result<Succeeded,Error>)->())?) {
+    open func writeConfigurationMotorVelocityAvailability(value: Bool, callback:((Result<Succeeded,Error>)->())? = nil) {
         let data = ConfigurationMotorVelocityAvailabilityRequest(value: value).data
-        writeCharacteristic(CHR_CONFIGURATION, data: data, callback)
+        writeCharacteristic(Cube.CHR_CONFIGURATION, data: data, callback)
     }
 }

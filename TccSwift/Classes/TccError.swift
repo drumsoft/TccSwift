@@ -11,6 +11,7 @@ public enum TccError: String, Error {
     case scanTimeouted = "BLE scanning timeouted"
     case connectionTimeouted = "Connection to the Cube timeouted"
     case connectionFailedWithNoReason = "Connection to the Cube failed but no reason provided."
+    case disconnectedWhileConnection = "Disconnected while connection."
     case requiredServiceNotFound = "Required services are not found on the connected Cube."
     case characteristicNotSupported = "Requested characteristic is not supported by current Cube."
     case resultIsNil = "Result value from characteristic is nil."
