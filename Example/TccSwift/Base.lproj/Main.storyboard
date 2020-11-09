@@ -71,7 +71,21 @@
                                     </stackView>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TwL-K4-xit">
                                         <rect key="frame" x="0.0" y="320" width="375" height="303"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="tailTruncation" numberOfLines="4" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vqF-QN-2T5">
+                                                <rect key="frame" x="8" y="8" width="359" height="287"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                        </subviews>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <constraints>
+                                            <constraint firstItem="vqF-QN-2T5" firstAttribute="top" secondItem="TwL-K4-xit" secondAttribute="topMargin" id="IfJ-dZ-M9u"/>
+                                            <constraint firstItem="vqF-QN-2T5" firstAttribute="leading" secondItem="TwL-K4-xit" secondAttribute="leadingMargin" id="SuX-xb-8qW"/>
+                                            <constraint firstAttribute="bottomMargin" secondItem="vqF-QN-2T5" secondAttribute="bottom" id="ZWb-4Z-BhM"/>
+                                            <constraint firstAttribute="trailingMargin" secondItem="vqF-QN-2T5" secondAttribute="trailing" id="msi-pd-o6h"/>
+                                        </constraints>
                                     </view>
                                 </subviews>
                             </stackView>
@@ -86,6 +100,7 @@
                     </view>
                     <navigationItem key="navigationItem" title="Cube Controller" id="zdw-Vf-2BZ"/>
                     <connections>
+                        <outlet property="labelStatus" destination="vqF-QN-2T5" id="7R6-nn-uP3"/>
                         <outlet property="sliderLeft" destination="rxW-Y1-ogV" id="5Zj-D3-ikm"/>
                         <outlet property="sliderRight" destination="cbe-7Y-M2D" id="hb5-Yl-SVk"/>
                     </connections>
