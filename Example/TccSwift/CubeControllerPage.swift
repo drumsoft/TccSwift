@@ -15,12 +15,8 @@ class CubeControllerPage: UIViewController, CubeDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        sliderLeft.removeConstraints(sliderLeft.constraints)
-        sliderRight.removeConstraints(sliderRight.constraints)
-        sliderLeft.translatesAutoresizingMaskIntoConstraints = true
-        sliderRight.translatesAutoresizingMaskIntoConstraints = true
-        sliderLeft.transform = sliderLeft.transform.rotated(by: CGFloat(Float.pi * 90 / 180))
-        sliderRight.transform = sliderRight.transform.rotated(by: CGFloat(Float.pi * 90 / 180))
+        sliderLeft.transform = sliderLeft.transform.rotated(by: CGFloat(Float.pi * -90 / 180))
+        sliderRight.transform = sliderRight.transform.rotated(by: CGFloat(Float.pi * -90 / 180))
     }
     
     override func viewWillAppear(_ animated: Bool) {
