@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0D310FD0255529190009D2E1 /* CubeListPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D310FCF255529190009D2E1 /* CubeListPage.swift */; };
+		0D310FD62555292C0009D2E1 /* CubeControllerPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D310FD52555292C0009D2E1 /* CubeControllerPage.swift */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
@@ -28,6 +30,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0D310FCF255529190009D2E1 /* CubeListPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CubeListPage.swift; sourceTree = "<group>"; };
+		0D310FD52555292C0009D2E1 /* CubeControllerPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CubeControllerPage.swift; sourceTree = "<group>"; };
 		151A2A0E0CD6F4C3D8272644 /* TccSwift.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = TccSwift.podspec; path = ../TccSwift.podspec; sourceTree = "<group>"; };
 		2C6A4A528C57F3DFA74BF7AF /* Pods_TccSwift_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TccSwift_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4462F2DCABBDE5FE46D922CB /* Pods-TccSwift_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TccSwift_Example.release.xcconfig"; path = "Target Support Files/Pods-TccSwift_Example/Pods-TccSwift_Example.release.xcconfig"; sourceTree = "<group>"; };
@@ -78,6 +82,15 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		0D310FCE255528EA0009D2E1 /* Pages */ = {
+			isa = PBXGroup;
+			children = (
+				0D310FCF255529190009D2E1 /* CubeListPage.swift */,
+				0D310FD52555292C0009D2E1 /* CubeControllerPage.swift */,
+			);
+			name = Pages;
+			sourceTree = "<group>";
+		};
 		607FACC71AFB9204008FA782 = {
 			isa = PBXGroup;
 			children = (
@@ -102,6 +115,7 @@
 		607FACD21AFB9204008FA782 /* Example for TccSwift */ = {
 			isa = PBXGroup;
 			children = (
+				0D310FCE255528EA0009D2E1 /* Pages */,
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
@@ -354,6 +368,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0D310FD62555292C0009D2E1 /* CubeControllerPage.swift in Sources */,
+				0D310FD0255529190009D2E1 /* CubeListPage.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 			);
