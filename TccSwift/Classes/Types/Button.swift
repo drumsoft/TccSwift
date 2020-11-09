@@ -19,7 +19,7 @@ public class ButtonResponse: TccResponse {
 }
 
 public class ButtonFunctionResponse: ButtonResponse {
-    var isPushed: Bool
+    public var isPushed: Bool
     init(_ data:Data) {
         isPushed = data[1] != 0 // 0x80 pushed, 0x00 released
     }

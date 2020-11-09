@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum TccError: String, Error {
+public enum TccError: String, LocalizedError {
     case scanTimeouted = "BLE scanning timeouted"
     case connectionTimeouted = "Connection to the Cube timeouted"
     case connectionFailedWithNoReason = "Connection to the Cube failed but no reason provided."
@@ -17,5 +17,8 @@ public enum TccError: String, Error {
     case resultIsNil = "Result value from characteristic is nil."
     case resultTypeUnmatch = "Type of value from characteristic is not match for callback."
     case resultParseFailed = "Parsing value from characteristic failed."
-    var localizedDescription: String { self.rawValue }
+    
+    public var errorDescription: String? {
+        self.rawValue
+    }
 }

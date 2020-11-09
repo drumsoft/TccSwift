@@ -645,7 +645,7 @@ open class Cube {
     ///
     /// - Parameters:
     ///   - se:         select sound effect.
-    ///   - volume:     0 means mute, 1 to 255 means max volume.
+    ///   - volume:     0: mute, 1: max volume.
     ///   - callback:   callback after write succeeded.
     open func writeSoundPlay(se:SoundEffect, volume:Double, callback:((Result<Succeeded,Error>)->())? = nil) {
         let data = SoundPlayRequest(se: se, volume: volume).data

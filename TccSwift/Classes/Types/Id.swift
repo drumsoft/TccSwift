@@ -24,17 +24,17 @@ public class IdResponse: TccResponse {
 /// The Cube is on Position ID Mat.
 public class IdPositionResponse: IdResponse {
     /// Position of the center of the cube. 0 to 65535. The actual value depends on the Mat which cube placed on.
-    var cubeX:Int
+    public var cubeX:Int
     /// Position of the center of the cube. 0 to 65535. The actual value depends on the Mat which cube placed on.
-    var cubeY:Int
+    public var cubeY:Int
     /// Rotation of the center of the cube. 0 to 360. The value is 0 at the X-axis direction and increase when rotated clockwise.
-    var cubeRotation:Int
+    public var cubeRotation:Int
     /// Position of the sensor of the cube. 0 to 65535. The actual value depends on the Mat which cube placed on.
-    var sensorX:Int
+    public var sensorX:Int
     /// Position of the sensor of the cube. 0 to 65535. The actual value depends on the Mat which cube placed on.
-    var sensorY:Int
+    public var sensorY:Int
     /// Rotation of the sensor of the cube. 0 to 360. The value is 0 at the X-axis direction and increase when rotated clockwise.
-    var sensorRotation:Int
+    public var sensorRotation:Int
     
     init(_ data: Data) {
         cubeX = Int(data.subdata(in: 1..<3).cubeUInt16Value)
@@ -48,9 +48,9 @@ public class IdPositionResponse: IdResponse {
 /// The Cube is on Standard ID Card.
 public class IdStandardResponse: IdResponse {
     /// ID of the Standard ID Card.
-    var id:UInt
+    public var id:UInt
     /// Rotation of the cube on the Standard ID Card. 0 to 360.
-    var cubeRotation:Int
+    public var cubeRotation:Int
     
     init(_ data: Data) {
         id = UInt(data.subdata(in: 1..<5).cubeUInt32Value)
