@@ -440,7 +440,7 @@ open class Cube {
     ///
     /// - Parameters:
     ///   - callback: callback after write succeeded.
-    open func writeRequestMotionSensorValues(callback:((Result<Succeeded,Error>)->())? = nil) {
+    open func writeRequestMotionSensorValues(callback: @escaping (Result<Succeeded,Error>)->()) {
         let data = SensorRequestMotionRequest().data
         writeCharacteristic(Cube.CHR_SENSOR, data: data, callback)
     }
@@ -449,7 +449,7 @@ open class Cube {
     ///
     /// - Parameters:
     ///   - callback: callback after write succeeded.
-    open func writeRequestMagneticSensorValues(callback:((Result<Succeeded,Error>)->())? = nil) {
+    open func writeRequestMagneticSensorValues(callback: @escaping (Result<Succeeded,Error>)->()) {
         let data = SensorRequestMagneticRequest().data
         writeCharacteristic(Cube.CHR_SENSOR, data: data, callback)
     }
@@ -619,7 +619,7 @@ open class Cube {
     ///   - green:    color green value 0.0 to 1.0
     ///   - blue:     color blue value 0.0 to 1.0
     ///   - callback: callback after write succeeded.
-    open func writeLightOn(duration:TimeInterval, red:Double, green:Double, blue:Double, callback:((Result<Succeeded,Error>)->())? = nil) {
+    open func writeLightOn(duration:TimeInterval, red:Double, green:Double, blue:Double, callback: @escaping (Result<Succeeded,Error>)->()) {
         let data = LightOnRequest(unit:LightOnUnit(duration: duration, red: red, green: green, blue: blue)).data
         writeCharacteristic(Cube.CHR_LIGHT, data: data, callback)
     }
@@ -630,7 +630,7 @@ open class Cube {
     ///   - repeats:    repeat sequence as loop. 0 means infinite loop.
     ///   - sequence:   sequence of light controls.
     ///   - callback:   callback after write succeeded.
-    open func writeLightSequence(repeats: Int, sequence:[LightOnUnit], callback:((Result<Succeeded,Error>)->())? = nil) {
+    open func writeLightSequence(repeats: Int, sequence:[LightOnUnit], callback: @escaping (Result<Succeeded,Error>)->()) {
         let data = LightOnSequenceRequest(repeats: repeats, sequence: sequence).data
         writeCharacteristic(Cube.CHR_LIGHT, data: data, callback)
     }
@@ -639,7 +639,7 @@ open class Cube {
     ///
     /// - Parameters:
     ///   - callback: callback after write succeeded.
-    open func writeLightAllOff(callback:((Result<Succeeded,Error>)->())? = nil) {
+    open func writeLightAllOff(callback: @escaping (Result<Succeeded,Error>)->()) {
         writeCharacteristic(Cube.CHR_LIGHT, data: LightAllOffRequest().data, callback)
     }
     
@@ -651,7 +651,7 @@ open class Cube {
     ///   - se:         select sound effect.
     ///   - volume:     0: mute, 1: max volume.
     ///   - callback:   callback after write succeeded.
-    open func writeSoundPlay(se:SoundEffect, volume:Double, callback:((Result<Succeeded,Error>)->())? = nil) {
+    open func writeSoundPlay(se:SoundEffect, volume:Double, callback: @escaping (Result<Succeeded,Error>)->()) {
         let data = SoundPlayRequest(se: se, volume: volume).data
         writeCharacteristic(Cube.CHR_SOUND, data: data, callback)
     }
@@ -667,7 +667,7 @@ open class Cube {
     ///   - duration:   0.01 to 2.55 seconds.
     ///   - note:   0 to 127, 57 = A4 440Hz, 128 = mute
     ///   - volume:     0 means mute, 1 to 255 means max volume.
-    open func writeSoundPlayNotes(repeats: Int, sequence:[SoundNoteUnit], callback:((Result<Succeeded,Error>)->())? = nil) {
+    open func writeSoundPlayNotes(repeats: Int, sequence:[SoundNoteUnit], callback: @escaping (Result<Succeeded,Error>)->()) {
         let data = SoundPlayNotesRequest(repeats: repeats, sequence: sequence).data
         writeCharacteristic(Cube.CHR_SOUND, data: data, callback)
     }
@@ -676,7 +676,7 @@ open class Cube {
     ///
     /// - Parameters:
     ///   - callback: callback after write succeeded.
-    open func writeSoundStop(callback:((Result<Succeeded,Error>)->())? = nil) {
+    open func writeSoundStop(callback: @escaping (Result<Succeeded,Error>)->()) {
         writeCharacteristic(Cube.CHR_SOUND, data: SoundStopRequest().data, callback)
     }
 
@@ -712,7 +712,7 @@ open class Cube {
     ///
     /// - Parameters:
     ///   - callback: callback after write succeeded.
-    open func writeConfigurationRequestBLEProtocolVersion(callback:((Result<Succeeded,Error>)->())? = nil) {
+    open func writeConfigurationRequestBLEProtocolVersion(callback: @escaping (Result<Succeeded,Error>)->()) {
         writeCharacteristic(Cube.CHR_CONFIGURATION, data: ConfigurationRequestBLEProtocolVersionRequest().data, callback)
     }
     
@@ -721,7 +721,7 @@ open class Cube {
     /// - Parameters:
     ///   - value:      level threshold in degree 1 to 45.
     ///   - callback:   callback after write succeeded.
-    open func writeConfigurationSensorLevelThreshold(value: Int, callback:((Result<Succeeded,Error>)->())? = nil) {
+    open func writeConfigurationSensorLevelThreshold(value: Int, callback: @escaping (Result<Succeeded,Error>)->()) {
         let data = ConfigurationSensorLevelThresholdRequest(value: value).data
         writeCharacteristic(Cube.CHR_CONFIGURATION, data: data, callback)
     }
@@ -731,7 +731,7 @@ open class Cube {
     /// - Parameters:
     ///   - value:      collision threshold in 1 to 10 collision level.
     ///   - callback:   callback after write succeeded.
-    open func writeConfigurationSensorCollisionThreshold(value: Int, callback:((Result<Succeeded,Error>)->())? = nil) {
+    open func writeConfigurationSensorCollisionThreshold(value: Int, callback: @escaping (Result<Succeeded,Error>)->()) {
         let data = ConfigurationSensorCollisionThresholdRequest(value: value).data
         writeCharacteristic(Cube.CHR_CONFIGURATION, data: data, callback)
     }
@@ -741,7 +741,7 @@ open class Cube {
     /// - Parameters:
     ///   - value:      double tap interval limit in 0 to 7 level.
     ///   - callback:   callback after write succeeded.
-    open func writeConfigurationSensorDoubleTapInterval(value: Int, callback:((Result<Succeeded,Error>)->())? = nil) {
+    open func writeConfigurationSensorDoubleTapInterval(value: Int, callback: @escaping (Result<Succeeded,Error>)->()) {
         let data = ConfigurationSensorDoubleTapIntervalRequest(value: value).data
         writeCharacteristic(Cube.CHR_CONFIGURATION, data: data, callback)
     }
@@ -752,7 +752,7 @@ open class Cube {
     ///   - interval:   minimum notify interval in 0.00 to 2.55 seconds.
     ///   - condition:  condition to notify.
     ///   - callback:   callback after write succeeded.
-    open func writeConfigurationSensorIdFrequency(interval: TimeInterval, condition: ConfigurationSensorIdNotifyCondition, callback:((Result<Succeeded,Error>)->())? = nil) {
+    open func writeConfigurationSensorIdFrequency(interval: TimeInterval, condition: ConfigurationSensorIdNotifyCondition, callback: @escaping (Result<Succeeded,Error>)->()) {
         let data = ConfigurationSensorIdFrequencyRequest(interval: interval, condition: condition).data
         writeCharacteristic(Cube.CHR_CONFIGURATION, data: data, callback)
     }
@@ -762,7 +762,7 @@ open class Cube {
     /// - Parameters:
     ///   - value:      threshold time to determined as "ID missed" in 0.00 to 2.55 seconds.
     ///   - callback:   callback after write succeeded.
-    open func writeConfigurationSensorIdMissedThreshold(value: TimeInterval, callback:((Result<Succeeded,Error>)->())? = nil) {
+    open func writeConfigurationSensorIdMissedThreshold(value: TimeInterval, callback: @escaping (Result<Succeeded,Error>)->()) {
         let data = ConfigurationSensorIdMissedThresholdRequest(value: value).data
         writeCharacteristic(Cube.CHR_CONFIGURATION, data: data, callback)
     }
@@ -772,7 +772,7 @@ open class Cube {
     /// - Parameters:
     ///   - value:      availability.
     ///   - callback:   callback after write succeeded.
-    open func writeConfigurationSensorMagneticAvailability(value: Bool, callback:((Result<Succeeded,Error>)->())? = nil) {
+    open func writeConfigurationSensorMagneticAvailability(value: Bool, callback: @escaping (Result<Succeeded,Error>)->()) {
         let data = ConfigurationSensorMagneticAvailabilityRequest(value: value).data
         writeCharacteristic(Cube.CHR_CONFIGURATION, data: data, callback)
     }
@@ -782,7 +782,7 @@ open class Cube {
     /// - Parameters:
     ///   - value:      availability.
     ///   - callback:   callback after write succeeded.
-    open func writeConfigurationMotorVelocityAvailability(value: Bool, callback:((Result<Succeeded,Error>)->())? = nil) {
+    open func writeConfigurationMotorVelocityAvailability(value: Bool, callback: @escaping (Result<Succeeded,Error>)->()) {
         let data = ConfigurationMotorVelocityAvailabilityRequest(value: value).data
         writeCharacteristic(Cube.CHR_CONFIGURATION, data: data, callback)
     }
