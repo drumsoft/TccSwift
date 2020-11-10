@@ -86,35 +86,35 @@ public class ConfigurationResponse: TccResponse {
 }
 
 public class ConfigurationBLEProtocolVersionResponse: ConfigurationResponse {
-    var version:String?
+    public var version:String?
     init(_ data:Data) {
-        version = String(data: data.subdata(in: 2..<8), encoding: .utf8)
+        version = String(data: data.subdata(in: 2..<(data.count)), encoding: .utf8)
     }
 }
 
 public class ConfigurationIdNotifyFrequencyResponse: ConfigurationResponse {
-    var isSucceeded: Bool
+    public var isSucceeded: Bool
     init(_ data:Data) {
         isSucceeded = data[2] == 0
     }
 }
 
 public class ConfigurationIdMissedNotifyThresholdResponse: ConfigurationResponse {
-    var isSucceeded: Bool
+    public var isSucceeded: Bool
     init(_ data:Data) {
         isSucceeded = data[2] == 0
     }
 }
 
 public class ConfigurationMagneticSensorAvailabilityResponse: ConfigurationResponse {
-    var isSucceeded: Bool
+    public var isSucceeded: Bool
     init(_ data:Data) {
         isSucceeded = data[2] == 0
     }
 }
 
 public class ConfigurationMotorVelocityAvailabilityResponse: ConfigurationResponse {
-    var isSucceeded: Bool
+    public var isSucceeded: Bool
     init(_ data:Data) {
         isSucceeded = data[2] == 0
     }

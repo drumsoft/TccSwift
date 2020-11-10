@@ -9,7 +9,7 @@ import Foundation
 
 // Motor (Write without response, Read, Notify) CHR_MOTOR
 
-enum MotorDestinationStatus: Int {
+public enum MotorDestinationStatus: Int {
     case unknown = -1
     case succeeded = 0
     case timeouted = 1
@@ -199,8 +199,8 @@ public class MotorResponse: TccResponse {
 }
 
 public class MotorDestinationResultResponse: MotorResponse {
-    var id: Int
-    var status: MotorDestinationStatus
+    public var id: Int
+    public var status: MotorDestinationStatus
     
     init(_ data:Data) {
         id = Int(data[1])
@@ -209,8 +209,8 @@ public class MotorDestinationResultResponse: MotorResponse {
 }
 
 public class MotorMultipleDestinationResultResponse: MotorResponse {
-    var id: Int
-    var status: MotorDestinationStatus
+    public var id: Int
+    public var status: MotorDestinationStatus
     
     init(_ data:Data) {
         id = Int(data[1])
@@ -219,8 +219,8 @@ public class MotorMultipleDestinationResultResponse: MotorResponse {
 }
 
 public class MotorVelocitiesResponse: MotorResponse {
-    var left:Int
-    var right:Int
+    public var left:Int
+    public var right:Int
     
     init(_ data:Data) {
         left = Int(data[1])

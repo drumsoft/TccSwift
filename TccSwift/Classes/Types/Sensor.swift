@@ -9,7 +9,7 @@ import Foundation
 
 // Sensor (Write, Read, Notify) CHR_SENSOR
 
-enum SensorOrientation: Int {
+public enum SensorOrientation: Int {
     case unknown = -1 // 不明な値
     case top = 1 // 天面が上
     case bottom = 2 // 底面が上
@@ -19,7 +19,7 @@ enum SensorOrientation: Int {
     case left = 6 // 左側面が上
 }
 
-enum SensorMagnetPosition: Int {
+public enum SensorMagnetPosition: Int {
     case unknown = -1 // 不明な値
     case none = 0 // 未装着
     case centerN = 1 // 中央にN極
@@ -57,25 +57,25 @@ public class SensorResponse: TccResponse {
 }
 
 public class SensorMotionResponse: SensorResponse {
-    var isLevel:Bool
-    var isCollided:Bool
-    var isDoubleTapped:Bool
+    public var isLevel:Bool
+    public var isCollided:Bool
+    public var isDoubleTapped:Bool
     /// which side faces up?
-    var orientation:SensorOrientation
+    public var orientation:SensorOrientation
     /// 0 is not shaken. 1 to 10 is shaken.
-    var shaken:Int
+    public var shaken:Int
     init(_ data:Data) {
         isLevel = data[1] != 0 // 1: level, 0: not level
         isCollided = data[2] != 0 // 1: collided, 0: not collided
         isDoubleTapped = data[3] != 0 // 1: doubletapped, 0: not doubletapped
         orientation = SensorOrientation.init(rawValue: Int(data[4])) ?? .unknown
-        shaken = Int(data[5])
+        shaken = data.count >= 6 ? Int(data[5]) : 0
     }
 }
 
 public class SensorMagneticResponse: SensorResponse {
     /// position of the magnet.
-    var position: SensorMagnetPosition
+    public var position: SensorMagnetPosition
     init(_ data:Data) {
         position = SensorMagnetPosition.init(rawValue: Int(data[1])) ?? .unknown
     }
