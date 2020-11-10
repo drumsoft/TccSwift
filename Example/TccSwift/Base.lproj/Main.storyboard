@@ -30,7 +30,7 @@
                                                 <rect key="frame" x="0.0" y="0.0" width="157.5" height="320"/>
                                                 <subviews>
                                                     <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="-1" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="rxW-Y1-ogV">
-                                                        <rect key="frame" x="-83" y="145" width="324" height="31"/>
+                                                        <rect key="frame" x="-83.5" y="145" width="324.5" height="31"/>
                                                         <connections>
                                                             <action selector="onSliderChanged:" destination="vXZ-lx-hvc" eventType="valueChanged" id="pDu-xN-Ode"/>
                                                             <action selector="onSliderReleased:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="SsK-kD-Mlk"/>
@@ -72,7 +72,7 @@
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TwL-K4-xit">
                                         <rect key="frame" x="0.0" y="320" width="375" height="303"/>
                                         <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="tailTruncation" numberOfLines="4" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vqF-QN-2T5">
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="tailTruncation" numberOfLines="10" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vqF-QN-2T5">
                                                 <rect key="frame" x="8" y="8" width="359" height="287"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <nil key="textColor"/>

@@ -22,7 +22,25 @@ class CubeControllerPage: UIViewController, CubeDelegate {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         cube.delegate = self
+        
+        _ = cube.startNotifyConfiguration { self.configurationNotified($0) }
+        
+        cube.writeConfigurationRequestBLEProtocolVersion() {
+            switch $0 {
+            case .failure(let error): self.alertError(error)
+            case .success(_): break
+            }
+        }
+        
+        cube.writeConfigurationSensorMagneticAvailability(value: true) {
+            switch $0 {
+            case .failure(let error): self.alertError(error)
+            case .success(_): break
+            }
+        }
+        
         _ = cube.startNotifyId() { self.idNotified($0) }
+        _ = cube.startNotifySensor() { self.sensorNotified($0) }
         _ = cube.startNotifyButton() { self.buttonNotified($0) }
         _ = cube.startNotifyBattery() { self.batteryNotified($0) }
     }
@@ -32,51 +50,108 @@ class CubeControllerPage: UIViewController, CubeDelegate {
         cube.disconnect()
     }
     
+    // MARK: configuration
+    
+    var bleProtocolVersion:String?
+    
+    private func configurationNotified(_ result:Result<ConfigurationResponse, Error>) {
+        switch result {
+        case .failure(let error): self.alertError(error)
+        case .success(let response):
+            switch response {
+            case let r as ConfigurationBLEProtocolVersionResponse:
+                bleProtocolVersion = r.version
+                statusUpdated()
+            case let r as ConfigurationIdNotifyFrequencyResponse:
+                print("Config IdNotifyFrequency: \(r.isSucceeded ? "succeeded" : "failed")")
+            case let r as ConfigurationIdMissedNotifyThresholdResponse:
+                print("Config IdMissedNotifyThreshold: \(r.isSucceeded ? "succeeded" : "failed")")
+            case let r as ConfigurationMagneticSensorAvailabilityResponse:
+                print("Config MagneticSensorAvailability: \(r.isSucceeded ? "succeeded" : "failed")")
+            case let r as ConfigurationMotorVelocityAvailabilityResponse:
+                print("Config MotorVelocityAvailability: \(r.isSucceeded ? "succeeded" : "failed")")
+            default: break
+            }
+        }
+    }
+
     // MARK: notification
     
     private var currentPosition:IdResponse?
+    private var isInMat:Bool = false
     
     private func idNotified(_ result:Result<IdResponse, Error>) {
         switch result {
-        case .success(let idResponse):
-            self.currentPosition = idResponse
-            self.statusUpdated()
-        case .failure(let error):
-            self.alertError(error)
-        }
-    }
-    
-    private var soundEffectIndex:Int = 0
-    private func playSound() {
-        var se = SoundEffect.init(rawValue: soundEffectIndex)
-        if se == nil {
-            se = SoundEffect.init(rawValue: 0)
-            soundEffectIndex = 0
-        }
-        cube.writeSoundPlay(se: se!, volume: 1) {
-            switch $0 {
-            case .success(_):
-                print("writeSoundPlay succeeded")
-            case .failure(let error):
-                self.alertError(error)
+        case .failure(let error): self.alertError(error)
+        case .success(let response):
+            switch currentPosition {
+            case is IdPositionResponse:
+                if !isInMat {
+                    isInMat = true
+                    playSound(.matIn)
+                }
+            case is IdPositionIdMissedResponse:
+                if isInMat {
+                    isInMat = false
+                    playSound(.matOut)
+                }
+            default: break
             }
+            self.currentPosition = response
+            self.statusUpdated()
         }
-        soundEffectIndex += 1
     }
     
+    private var currentMotion:SensorMotionResponse?
+    private var currentMagnetic:SensorMagneticResponse?
+
+    private func sensorNotified(_ result:Result<SensorResponse, Error>) {
+        switch result {
+        case .failure(let error): self.alertError(error)
+        case .success(let response):
+            switch response {
+            case let r as SensorMotionResponse:
+                if r.isCollided {
+                    self.playSound(.get1)
+                    self.lightOn(.red)
+                }
+                if r.isDoubleTapped {
+                    self.playSound(.get2)
+                    self.lightOn(.green)
+                }
+                if r.shaken > 7 {
+                    self.playSound(.get3)
+                    self.lightOn(.blue)
+                }
+                currentMotion = r
+                self.statusUpdated()
+            case let r as SensorMagneticResponse:
+                if r.position != currentMagnetic?.position {
+                    self.playSound(.effect1)
+                    self.lightOn(.magenta)
+                }
+                currentMagnetic = r
+                self.statusUpdated()
+            default:
+                break
+            }
+            self.statusUpdated()
+        }
+    }
+
     private func buttonNotified(_ result:Result<ButtonResponse, Error>) {
         switch result {
+        case .failure(let error): self.alertError(error)
         case .success(let response):
             switch response {
             case let b as ButtonFunctionResponse:
                 if b.isPushed {
-                    self.playSound()
+                    self.playSound(.selected)
+                    self.lightOn(.cyan)
                 }
             default:
                 break
             }
-        case .failure(let error):
-            self.alertError(error)
         }
     }
     
@@ -84,17 +159,17 @@ class CubeControllerPage: UIViewController, CubeDelegate {
     
     private func batteryNotified(_ result:Result<BatteryResponse, Error>) {
         switch result {
-        case .success(let batteryResponse):
-            self.battery = batteryResponse.capacity
+        case .failure(let error): self.alertError(error)
+        case .success(let response):
+            self.battery = response.capacity
             self.statusUpdated()
-        case .failure(let error):
-            self.alertError(error)
         }
     }
     
     @IBOutlet weak var labelStatus: UILabel!
     
     private func statusUpdated() {
+        // Position ID
         let positionText:String
         switch currentPosition {
         case let p as IdPositionResponse:
@@ -106,9 +181,54 @@ class CubeControllerPage: UIViewController, CubeDelegate {
         case is IdStandardResponse:
             positionText = "removed from Standard ID"
         default:
-            positionText = "no ID provided."
+            positionText = ""
         }
-        labelStatus.text = "battery: \(battery.flatMap{String($0)} ?? "?") %\n\(positionText)"
+        
+        // Motion
+        let motionText:String
+        if let m = currentMotion {
+            motionText = "level:\(m.isLevel), collided:\(m.isCollided), doubleTapped:\(m.isDoubleTapped), orientation:\(m.orientation), shaken:\(m.shaken)"
+        } else {
+            motionText = ""
+        }
+
+        // Magnetic
+        let magneticText:String
+        if let m = currentMagnetic {
+            magneticText = "position:\(m.position)"
+        } else {
+            magneticText = ""
+        }
+
+        labelStatus.text =
+            "Version: \(bleProtocolVersion ?? "")\n" +
+            "Battery: \(battery.flatMap{String($0)} ?? "?") %\n" +
+            "ID: \(positionText)\n" +
+            "Motion: \(motionText)\n" +
+            "Magnet: \(magneticText)\n"
+    }
+    
+    // MARK: other operation
+    
+    private func playSound(_ se:SoundEffect) {
+        cube.writeSoundPlay(se: se, volume: 1) {
+            switch $0 {
+            case .failure(let error): self.alertError(error)
+            case .success(_): break
+            }
+        }
+    }
+    
+    private func lightOn(_ color:UIColor) {
+        var r:CGFloat = 0, g:CGFloat = 0, b:CGFloat = 0, a:CGFloat = 0
+        color.getRed(&r, green: &g, blue: &b, alpha: &a)
+        
+        cube.writeLightOn(duration: 0.5, red: Double(r), green: Double(g), blue: Double(b)) {
+            switch $0 {
+            case .failure(let error): self.alertError(error)
+            case .success(_): break
+            }
+        }
     }
 
     // MARK: sliders for motor
