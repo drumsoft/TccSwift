@@ -223,7 +223,7 @@ open class Cube {
         let chr_id = characteristic.uuid
         if writeWaiting[chr_id] != nil && writeWaiting[chr_id]!.count > 0 {
             while writeWaiting[chr_id]!.count > 0 {
-                callbackResult(error == nil ? Succeeded() : nil, error, to: writeWaiting[chr_id]!.removeFirst(), for: chr_id)
+                callbackWriteResult(error == nil ? Succeeded() : nil, error, to: writeWaiting[chr_id]!.removeFirst())
             }
         } else if error != nil {
             didReceivedUnhandledError(error!)
@@ -298,6 +298,10 @@ open class Cube {
         }
     }
     
+    private func callbackWriteResult(_ result:TccResponse? = nil, _ error:Error? = nil, to waiting:Any) {
+        callbackFor(result: result, error: error, to: waiting as! Waiting<Succeeded>)
+    }
+
     private func callbackFor<ResultType:TccResponse>(result:TccResponse?, error:Error?, to waiting:Waiting<ResultType>) {
         if error != nil {
             waiting.callback(Result.failure(error!))
