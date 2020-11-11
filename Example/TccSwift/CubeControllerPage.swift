@@ -13,6 +13,8 @@ class CubeControllerPage: UIViewController, CubeDelegate {
     
     internal var cube: Cube!
     
+    @IBOutlet weak var labelIdentifier: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         sliderLeft.transform = sliderLeft.transform.rotated(by: CGFloat(Float.pi * -90 / 180))
@@ -43,6 +45,8 @@ class CubeControllerPage: UIViewController, CubeDelegate {
         _ = cube.startNotifySensor() { self.sensorNotified($0) }
         _ = cube.startNotifyButton() { self.buttonNotified($0) }
         _ = cube.startNotifyBattery() { self.batteryNotified($0) }
+        
+        labelIdentifier.text = cube.identifierString
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -166,7 +170,13 @@ class CubeControllerPage: UIViewController, CubeDelegate {
         }
     }
     
+    // MARK: Display Cube status
+    
     @IBOutlet weak var labelStatus: UILabel!
+    
+    private func prettyBool(_ bool:Bool?) -> String {
+        return (bool ?? false) ? "✔️" : "＿"
+    }
     
     private func statusUpdated() {
         // Position ID
@@ -187,7 +197,7 @@ class CubeControllerPage: UIViewController, CubeDelegate {
         // Motion
         let motionText:String
         if let m = currentMotion {
-            motionText = "level:\(m.isLevel), collided:\(m.isCollided), doubleTapped:\(m.isDoubleTapped), orientation:\(m.orientation), shaken:\(m.shaken)"
+            motionText = "level:\(prettyBool(m.isLevel)), collided:\(prettyBool(m.isCollided)), doubleTapped:\(prettyBool(m.isDoubleTapped)),\n\t orientation:\(m.orientation), shaken:\(m.shaken)"
         } else {
             motionText = ""
         }
@@ -208,7 +218,7 @@ class CubeControllerPage: UIViewController, CubeDelegate {
             "Magnet: \(magneticText)\n"
     }
     
-    // MARK: other operation
+    // MARK: Interaction by sound and light.
     
     private func playSound(_ se:SoundEffect) {
         cube.writeSoundPlay(se: se, volume: 1) {

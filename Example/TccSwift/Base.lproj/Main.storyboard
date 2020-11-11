@@ -23,8 +23,17 @@
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="NSS-dF-Sl9">
                                 <rect key="frame" x="0.0" y="44" width="375" height="623"/>
                                 <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="Rbg-5r-PQP">
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="44" id="45B-1Y-Gqw"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
                                     <stackView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="1000" distribution="fillEqually" spacing="60" translatesAutoresizingMaskIntoConstraints="NO" id="BVZ-wA-gnk">
-                                        <rect key="frame" x="0.0" y="0.0" width="375" height="320"/>
+                                        <rect key="frame" x="0.0" y="44" width="375" height="320"/>
                                         <subviews>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dVm-hi-BQd">
                                                 <rect key="frame" x="0.0" y="0.0" width="157.5" height="320"/>
@@ -70,10 +79,10 @@
                                         </constraints>
                                     </stackView>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TwL-K4-xit">
-                                        <rect key="frame" x="0.0" y="320" width="375" height="303"/>
+                                        <rect key="frame" x="0.0" y="364" width="375" height="259"/>
                                         <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="tailTruncation" numberOfLines="10" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vqF-QN-2T5">
-                                                <rect key="frame" x="8" y="8" width="359" height="287"/>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="tailTruncation" numberOfLines="20" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="vqF-QN-2T5">
+                                                <rect key="frame" x="8" y="8" width="359" height="243"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
@@ -100,6 +109,7 @@
                     </view>
                     <navigationItem key="navigationItem" title="Cube Controller" id="zdw-Vf-2BZ"/>
                     <connections>
+                        <outlet property="labelIdentifier" destination="Rbg-5r-PQP" id="hx9-sO-zOd"/>
                         <outlet property="labelStatus" destination="vqF-QN-2T5" id="7R6-nn-uP3"/>
                         <outlet property="sliderLeft" destination="rxW-Y1-ogV" id="5Zj-D3-ikm"/>
                         <outlet property="sliderRight" destination="cbe-7Y-M2D" id="hb5-Yl-SVk"/>
