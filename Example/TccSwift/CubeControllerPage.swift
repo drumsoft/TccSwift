@@ -126,7 +126,7 @@ class CubeControllerPage: UIViewController, CubeDelegate {
                 currentMotion = r
                 self.statusUpdated()
             case let r as SensorMagneticResponse:
-                if r.position != currentMagnetic?.position {
+                if r.position != .none && r.position != currentMagnetic?.position {
                     self.playSound(.effect1)
                     self.lightOn(.magenta)
                 }
