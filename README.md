@@ -5,11 +5,18 @@
 [![License](https://img.shields.io/cocoapods/l/TccSwift.svg?style=flat)](https://cocoapods.org/pods/TccSwift)
 [![Platform](https://img.shields.io/cocoapods/p/TccSwift.svg?style=flat)](https://cocoapods.org/pods/TccSwift)
 
+Library for communicating with toio Core Cubes using Swift and iOS.
+
+"toio Core Cube" official specification: https://toio.github.io/toio-spec/
+
 ## Example
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
 ## Requirements
+
+* iOS 10.3 or later
+* toio Core Cube (v2.1.0 or later)
 
 ## Installation
 
