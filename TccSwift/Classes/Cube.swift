@@ -435,7 +435,7 @@ open class Cube {
         stopNotifyCharacteristic(Cube.CHR_SENSOR, id)
     }
     
-    /// Request Motion Sensor Notification
+    /// Request Motion Sensor Notification ... !! Seems not implemented !!
     ///
     /// - Parameters:
     ///   - callback: callback after write succeeded.
@@ -444,7 +444,7 @@ open class Cube {
         writeCharacteristic(Cube.CHR_SENSOR, data: data, callback)
     }
     
-    /// Request Magnetic Sensor Notification
+    /// Request Magnetic Sensor Notification ... !! Seems not implemented !!
     ///
     /// - Parameters:
     ///   - callback: callback after write succeeded.
@@ -511,7 +511,7 @@ open class Cube {
 
     // MARK: Motor (Write without response, Read, Notify) CHR_MOTOR
     
-    /// Read Motor values (Motion, Magnetic) from the Cube
+    /// Read Motor values (Motion, Magnetic) from the Cube ... !! Seems not implemented !!
     ///
     /// - Parameters:
     ///   - callback: callback when value read.
