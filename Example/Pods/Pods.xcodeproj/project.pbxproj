@@ -383,14 +383,14 @@
 		0D310F9E2555264E0009D2E1 /* Types */ = {
 			isa = PBXGroup;
 			children = (
+				0D310FA62555264E0009D2E1 /* Types.swift */,
 				0D310F9F2555264E0009D2E1 /* Id.swift */,
 				0D310FA02555264E0009D2E1 /* Sensor.swift */,
-				0D310FA12555264E0009D2E1 /* Light.swift */,
-				0D310FA22555264E0009D2E1 /* Battery.swift */,
-				0D310FA32555264E0009D2E1 /* Sound.swift */,
 				0D310FA42555264E0009D2E1 /* Button.swift */,
+				0D310FA22555264E0009D2E1 /* Battery.swift */,
 				0D310FA52555264E0009D2E1 /* Motor.swift */,
-				0D310FA62555264E0009D2E1 /* Types.swift */,
+				0D310FA12555264E0009D2E1 /* Light.swift */,
+				0D310FA32555264E0009D2E1 /* Sound.swift */,
 				0D310FA72555264E0009D2E1 /* Configuration.swift */,
 			);
 			name = Types;

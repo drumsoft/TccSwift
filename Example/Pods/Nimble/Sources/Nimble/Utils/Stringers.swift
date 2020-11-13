@@ -5,15 +5,15 @@ internal func identityAsString(_ value: Any?) -> String {
 #if os(Linux)
     #if swift(>=4.0)
         #if !swift(>=4.1.50)
-            anyObject = value as? AnyObject
+            anyObject = time as? AnyObject
         #else
-            anyObject = value as AnyObject?
+            anyObject = time as AnyObject?
         #endif
     #else
         #if !swift(>=3.4)
-            anyObject = value as? AnyObject
+            anyObject = time as? AnyObject
         #else
-            anyObject = value as AnyObject?
+            anyObject = time as AnyObject?
         #endif
     #endif
 #else
