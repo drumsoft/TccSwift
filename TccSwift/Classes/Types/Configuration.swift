@@ -39,7 +39,7 @@ struct ConfigurationSensorDoubleTapIntervalRequest {
 public enum ConfigurationLocationNotificationCondition: Int {
     case always = 0 // notify always.
     case onValueChanged = 1 // notify when values changed.
-    case atLeast300millisec = 2 // notify when values changed and after 300 millisec interval.
+    case atLeast300millisec = 0xff // notify when values changed and after 300 millisec interval.
 }
 
 struct ConfigurationLocationNotificationFrequencyRequest {

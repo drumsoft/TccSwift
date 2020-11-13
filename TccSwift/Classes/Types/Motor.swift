@@ -158,7 +158,7 @@ struct MotorMoveToMultipleDestinationRequest {
     let destinations:[MotorDestinationUnit]
     var data:Data {
         Data([
-            UInt8(0x03),
+            UInt8(0x04),
             UInt8(id),
             UInt8(floor(timeout)),
             UInt8(curve.rawValue),
