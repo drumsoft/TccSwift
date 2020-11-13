@@ -43,7 +43,7 @@ class TestWithCube_OnMat: QuickSpec {
                     switch $0 {
                     case .success(let r):
                         switch r {
-                        case let position as IdPositionResponse:
+                        case let position as LocationPositionIdResponse:
                             x = position.cubeX
                             y = position.cubeY
                             rotation = position.cubeRotation

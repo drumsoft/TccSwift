@@ -66,9 +66,9 @@ class CubeControllerPage: UIViewController, CubeDelegate {
             case let r as ConfigurationBLEProtocolVersionResponse:
                 bleProtocolVersion = r.version
                 statusUpdated()
-            case let r as ConfigurationIdNotificationFrequencyResponse:
+            case let r as ConfigurationLocationNotificationFrequencyResponse:
                 print("Config IdNotificationFrequency: \(r.isSucceeded ? "succeeded" : "failed")")
-            case let r as ConfigurationIdMissedThresholdResponse:
+            case let r as ConfigurationLocationMissedThresholdResponse:
                 print("Config IdMissedThreshold: \(r.isSucceeded ? "succeeded" : "failed")")
             case let r as ConfigurationMagneticSensorAvailabilityResponse:
                 print("Config MagneticSensorAvailability: \(r.isSucceeded ? "succeeded" : "failed")")
@@ -81,20 +81,20 @@ class CubeControllerPage: UIViewController, CubeDelegate {
 
     // MARK: notification
     
-    private var currentPosition:IdResponse?
+    private var currentPosition:LocationResponse?
     private var isInMat:Bool = false
     
-    private func idNotified(_ result:Result<IdResponse, Error>) {
+    private func idNotified(_ result:Result<LocationResponse, Error>) {
         switch result {
         case .failure(let error): self.alertError(error)
         case .success(let response):
             switch currentPosition {
-            case is IdPositionResponse:
+            case is LocationPositionIdResponse:
                 if !isInMat {
                     isInMat = true
                     playSound(.matIn)
                 }
-            case is IdPositionIdMissedResponse:
+            case is LocationPositionIdMissedResponse:
                 if isInMat {
                     isInMat = false
                     playSound(.matOut)
@@ -182,13 +182,13 @@ class CubeControllerPage: UIViewController, CubeDelegate {
         // Position ID
         let positionText:String
         switch currentPosition {
-        case let p as IdPositionResponse:
+        case let p as LocationPositionIdResponse:
             positionText = "Position ID: (\(p.cubeX), \(p.cubeY)), rotation: \(p.cubeRotation)"
-        case let p as IdStandardResponse:
-            positionText = "Standard ID: \(p.id), rotation: \(p.cubeRotation)"
-        case is IdPositionIdMissedResponse:
+        case let p as LocationStandardIdResponse:
+            positionText = "Standard ID: \(p.standardId), rotation: \(p.cubeRotation)"
+        case is LocationPositionIdMissedResponse:
             positionText = "removed from Position ID"
-        case is IdStandardResponse:
+        case is LocationStandardIdMissedResponse:
             positionText = "removed from Standard ID"
         default:
             positionText = ""

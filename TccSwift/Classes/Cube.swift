@@ -242,7 +242,7 @@ open class Cube {
         }
         switch chr_id {
         case Cube.CHR_ID:
-            return IdResponse.parse(data!)
+            return LocationResponse.parse(data!)
         case Cube.CHR_SENSOR:
             return SensorResponse.parse(data!)
         case Cube.CHR_BUTTON:
@@ -282,7 +282,7 @@ open class Cube {
     private func callbackResult(_ result:TccResponse? = nil, _ error:Error? = nil, to waiting:Any, for chr_id:CBUUID) {
         switch chr_id {
         case Cube.CHR_ID:
-            callbackFor(result: result, error: error, to: waiting as! Waiting<IdResponse>)
+            callbackFor(result: result, error: error, to: waiting as! Waiting<LocationResponse>)
         case Cube.CHR_SENSOR:
             callbackFor(result: result, error: error, to: waiting as! Waiting<SensorResponse>)
         case Cube.CHR_BUTTON:
@@ -386,7 +386,7 @@ open class Cube {
     ///
     /// - Parameters:
     ///   - callback: callback when value read.
-    open func readId(_ callback: @escaping (Result<IdResponse,Error>)->()) {
+    open func readId(_ callback: @escaping (Result<LocationResponse,Error>)->()) {
         readCharacteristic(Cube.CHR_ID, callback)
     }
     
@@ -396,7 +396,7 @@ open class Cube {
     ///   - callback: callback when values notified.
     ///
     /// - Returns:    the notification id.
-    open func startNotifyId(_ callback: @escaping (Result<IdResponse,Error>)->()) -> UInt {
+    open func startNotifyId(_ callback: @escaping (Result<LocationResponse,Error>)->()) -> UInt {
         return startNotifyCharacteristic(Cube.CHR_ID, callback)
     }
     
@@ -752,8 +752,8 @@ open class Cube {
     ///   - interval:   minimum notify interval in 0.00 to 2.55 seconds.
     ///   - condition:  condition to notify.
     ///   - callback:   callback after write succeeded.
-    open func writeConfigurationIdNotificationFrequency(interval: TimeInterval, condition: ConfigurationIdNotificationCondition, callback: @escaping (Result<Succeeded,Error>)->()) {
-        let data = ConfigurationIdNotificationFrequencyRequest(interval: interval, condition: condition).data
+    open func writeConfigurationIdNotificationFrequency(interval: TimeInterval, condition: ConfigurationLocationNotificationCondition, callback: @escaping (Result<Succeeded,Error>)->()) {
+        let data = ConfigurationLocationNotificationFrequencyRequest(interval: interval, condition: condition).data
         writeCharacteristic(Cube.CHR_CONFIGURATION, data: data, callback)
     }
 
@@ -763,7 +763,7 @@ open class Cube {
     ///   - value:      threshold time to determined as "ID missed" in 0.00 to 2.55 seconds.
     ///   - callback:   callback after write succeeded.
     open func writeConfigurationIdMissedThreshold(_ time: TimeInterval, callback: @escaping (Result<Succeeded,Error>)->()) {
-        let data = ConfigurationIdMissedThresholdRequest(time: time).data
+        let data = ConfigurationLocationMissedThresholdRequest(time: time).data
         writeCharacteristic(Cube.CHR_CONFIGURATION, data: data, callback)
     }
 

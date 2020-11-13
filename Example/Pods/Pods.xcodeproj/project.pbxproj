@@ -17,7 +17,7 @@
 		0D310F96255526460009D2E1 /* Cube.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D310F93255526460009D2E1 /* Cube.swift */; };
 		0D310F97255526460009D2E1 /* CubeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D310F94255526460009D2E1 /* CubeManager.swift */; };
 		0D310F98255526460009D2E1 /* TccError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D310F95255526460009D2E1 /* TccError.swift */; };
-		0D310FA82555264E0009D2E1 /* Id.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D310F9F2555264E0009D2E1 /* Id.swift */; };
+		0D310FA82555264E0009D2E1 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D310F9F2555264E0009D2E1 /* Location.swift */; };
 		0D310FA92555264E0009D2E1 /* Sensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D310FA02555264E0009D2E1 /* Sensor.swift */; };
 		0D310FAA2555264E0009D2E1 /* Light.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D310FA12555264E0009D2E1 /* Light.swift */; };
 		0D310FAB2555264E0009D2E1 /* Battery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D310FA22555264E0009D2E1 /* Battery.swift */; };
@@ -183,7 +183,7 @@
 		0D310F93255526460009D2E1 /* Cube.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Cube.swift; path = TccSwift/Classes/Cube.swift; sourceTree = "<group>"; };
 		0D310F94255526460009D2E1 /* CubeManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CubeManager.swift; path = TccSwift/Classes/CubeManager.swift; sourceTree = "<group>"; };
 		0D310F95255526460009D2E1 /* TccError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TccError.swift; path = TccSwift/Classes/TccError.swift; sourceTree = "<group>"; };
-		0D310F9F2555264E0009D2E1 /* Id.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Id.swift; sourceTree = "<group>"; };
+		0D310F9F2555264E0009D2E1 /* Location.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
 		0D310FA02555264E0009D2E1 /* Sensor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sensor.swift; sourceTree = "<group>"; };
 		0D310FA12555264E0009D2E1 /* Light.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Light.swift; sourceTree = "<group>"; };
 		0D310FA22555264E0009D2E1 /* Battery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Battery.swift; sourceTree = "<group>"; };
@@ -384,7 +384,7 @@
 			isa = PBXGroup;
 			children = (
 				0D310FA62555264E0009D2E1 /* Types.swift */,
-				0D310F9F2555264E0009D2E1 /* Id.swift */,
+				0D310F9F2555264E0009D2E1 /* Location.swift */,
 				0D310FA02555264E0009D2E1 /* Sensor.swift */,
 				0D310FA42555264E0009D2E1 /* Button.swift */,
 				0D310FA22555264E0009D2E1 /* Battery.swift */,
@@ -921,7 +921,7 @@
 				0D310FAB2555264E0009D2E1 /* Battery.swift in Sources */,
 				0D310FB02555264E0009D2E1 /* Configuration.swift in Sources */,
 				0D310F98255526460009D2E1 /* TccError.swift in Sources */,
-				0D310FA82555264E0009D2E1 /* Id.swift in Sources */,
+				0D310FA82555264E0009D2E1 /* Location.swift in Sources */,
 				B09B234ADA3247D4DBA09D7CA9FE5106 /* TccSwift-dummy.m in Sources */,
 				0D310FAC2555264E0009D2E1 /* Sound.swift in Sources */,
 				0D310F97255526460009D2E1 /* CubeManager.swift in Sources */,

@@ -35,7 +35,7 @@ class TestWithCube_v2_2_0: QuickSpec {
                 it("Configuration Id Notification Frequency") {
                     waitUntil { done in
                         cube?.readConfiguration {
-                            testResult($0, as: ConfigurationIdNotificationFrequencyResponse.self)
+                            testResult($0, as: ConfigurationLocationNotificationFrequencyResponse.self)
                         }
                         cube?.writeConfigurationIdNotificationFrequency(interval: 0.03, condition: .atLeast300millisec) {
                             testResult($0)
@@ -46,7 +46,7 @@ class TestWithCube_v2_2_0: QuickSpec {
                 it("Configuration Id Missed Threshold") {
                     waitUntil { done in
                         cube?.readConfiguration {
-                            testResult($0, as: ConfigurationIdMissedThresholdResponse.self)
+                            testResult($0, as: ConfigurationLocationMissedThresholdResponse.self)
                         }
                         cube?.writeConfigurationIdMissedThreshold(0.1) {
                             testResult($0)

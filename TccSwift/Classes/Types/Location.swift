@@ -1,28 +1,30 @@
 //
-//  Id.swift
+//  Location.swift
 //  TccSwift
 //
 //  Created by hrk on 2020/10/29.
 //
 
+// Though they call it as "ID" come from "Sensor". Since the words "ID" and "Sensor" are tend to be ambiguous, we will call it "Location".
+
 import Foundation
 
-// ID (Read, Notify) CHR_ID
+// Location (Read, Notify) CHR_ID
 
-/// ID (Position ID, Standard ID) return value
-public class IdResponse: TccResponse {
-    static func parse(_ data: Data) -> IdResponse? {
+/// Location (Position ID, Standard ID) return value
+public class LocationResponse: TccResponse {
+    static func parse(_ data: Data) -> LocationResponse? {
         switch data[0] {
-        case 0x01:  return IdPositionResponse(data)
-        case 0x02:  return IdStandardResponse(data)
-        case 0x03:  return IdPositionIdMissedResponse()
-        case 0x04:  return IdStandardIdMissedResponse()
+        case 0x01:  return LocationPositionIdResponse(data)
+        case 0x02:  return LocationStandardIdResponse(data)
+        case 0x03:  return LocationPositionIdMissedResponse()
+        case 0x04:  return LocationStandardIdMissedResponse()
         default:    return nil
         }
     }
 }
-/// The Cube is on Position ID Mat.
-public class IdPositionResponse: IdResponse {
+/// The Cube Located on Position ID Mat.
+public class LocationPositionIdResponse: LocationResponse {
     /// Position of the center of the cube. 0 to 65535. The actual value depends on the Mat which cube placed on.
     public let cubeX:Int
     /// Position of the center of the cube. 0 to 65535. The actual value depends on the Mat which cube placed on.
@@ -45,19 +47,19 @@ public class IdPositionResponse: IdResponse {
         sensorRotation = Int(data.subdata(in: 11..<13).cubeUInt16Value)
     }
 }
-/// The Cube is on Standard ID Card.
-public class IdStandardResponse: IdResponse {
+/// The Cube Located on Standard ID Card.
+public class LocationStandardIdResponse: LocationResponse {
     /// ID of the Standard ID Card.
-    public let id:UInt
+    public let standardId:UInt
     /// Rotation of the cube on the Standard ID Card. 0 to 360.
     public let cubeRotation:Int
     
     init(_ data: Data) {
-        id = UInt(data.subdata(in: 1..<5).cubeUInt32Value)
+        standardId = UInt(data.subdata(in: 1..<5).cubeUInt32Value)
         cubeRotation = Int(data.subdata(in: 5..<7).cubeUInt16Value)
     }
 }
 /// The Cube is displaced from Position ID Mat.
-public class IdPositionIdMissedResponse: IdResponse {}
+public class LocationPositionIdMissedResponse: LocationResponse {}
 /// The Cube is displaced from Standard ID Card.
-public class IdStandardIdMissedResponse: IdResponse {}
+public class LocationStandardIdMissedResponse: LocationResponse {}

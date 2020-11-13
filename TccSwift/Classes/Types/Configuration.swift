@@ -36,21 +36,21 @@ struct ConfigurationSensorDoubleTapIntervalRequest {
     }
 }
 
-public enum ConfigurationIdNotificationCondition: Int {
+public enum ConfigurationLocationNotificationCondition: Int {
     case always = 0 // notify always.
     case onValueChanged = 1 // notify when values changed.
     case atLeast300millisec = 2 // notify when values changed and after 300 millisec interval.
 }
 
-struct ConfigurationIdNotificationFrequencyRequest {
+struct ConfigurationLocationNotificationFrequencyRequest {
     let interval: TimeInterval
-    let condition: ConfigurationIdNotificationCondition
+    let condition: ConfigurationLocationNotificationCondition
     var data:Data {
         Data([UInt8(0x18), UInt8(0), UInt8(interval * 100), UInt8(condition.rawValue)])
     }
 }
 
-struct ConfigurationIdMissedThresholdRequest {
+struct ConfigurationLocationMissedThresholdRequest {
     let time: TimeInterval
     var data:Data {
         Data([UInt8(0x19), UInt8(0), UInt8(round(time * 100))])
@@ -76,8 +76,8 @@ public class ConfigurationResponse: TccResponse {
     static func parse(_ data: Data) -> ConfigurationResponse? {
         switch data[0] {
         case 0x81:  return ConfigurationBLEProtocolVersionResponse(data)
-        case 0x98:  return ConfigurationIdNotificationFrequencyResponse(data)
-        case 0x99:  return ConfigurationIdMissedThresholdResponse(data)
+        case 0x98:  return ConfigurationLocationNotificationFrequencyResponse(data)
+        case 0x99:  return ConfigurationLocationMissedThresholdResponse(data)
         case 0x9b:  return ConfigurationMagneticSensorAvailabilityResponse(data)
         case 0x9c:  return ConfigurationMotorVelocityAvailabilityResponse(data)
         default:    return nil
@@ -92,14 +92,14 @@ public class ConfigurationBLEProtocolVersionResponse: ConfigurationResponse {
     }
 }
 
-public class ConfigurationIdNotificationFrequencyResponse: ConfigurationResponse {
+public class ConfigurationLocationNotificationFrequencyResponse: ConfigurationResponse {
     public let isSucceeded: Bool
     init(_ data:Data) {
         isSucceeded = data[2] == 0
     }
 }
 
-public class ConfigurationIdMissedThresholdResponse: ConfigurationResponse {
+public class ConfigurationLocationMissedThresholdResponse: ConfigurationResponse {
     public let isSucceeded: Bool
     init(_ data:Data) {
         isSucceeded = data[2] == 0

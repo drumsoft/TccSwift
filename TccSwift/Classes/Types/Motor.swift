@@ -13,7 +13,7 @@ public enum MotorDestinationStatus: Int {
     case unknown = -1
     case succeeded = 0
     case timeouted = 1
-    case toidIdMissed = 2
+    case toioIdMissed = 2
     case alreadyAtDestination = 3
     case turnedOff = 4
     case canceledByOtherDestination = 5
