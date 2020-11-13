@@ -97,6 +97,12 @@ public struct MotorDestinationUnit {
     let destinationY: Int
     let finalRotation: Int
     let finalRotationType: MotorDestinationFinalRotation
+    public init(destinationX: Int, destinationY: Int, finalRotation: Int, finalRotationType: MotorDestinationFinalRotation) {
+        self.destinationX = destinationX
+        self.destinationY = destinationY
+        self.finalRotation = finalRotation
+        self.finalRotationType = finalRotationType
+    }
     var data:Data {
         var rotType = finalRotationType
         if finalRotation < 0 {
@@ -165,7 +171,7 @@ struct MotorMoveToMultipleDestinationRequest {
 }
 
 /// parameter for moving with acceralation
-struct MotorMoveWithAcceralationRequest {
+struct MotorActivateWithAcceralationRequest {
     let velocity: Int
     let acceralation: Int // Δvelocity / Δ(100ms), 0 means immediately set to specified velocity.
     let angularVelocity: Int // 0 to 65535, degree/sec

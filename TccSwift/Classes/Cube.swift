@@ -604,8 +604,8 @@ open class Cube {
     ///   - priority:           Set priority to keep velocity or angularVelocity .
     ///   - duration:           0.01 to 2.55 seconds. 0 means infinite.
     ///   - callback:           callback after write succeeded.
-    open func writeMoveToMultipleDestination(velocity: Int, acceralation: Int, angularVelocity: Int, priority: MotorAcceralationPriority, duration: TimeInterval) {
-        let data = MotorMoveWithAcceralationRequest(velocity: velocity, acceralation: acceralation, angularVelocity: angularVelocity, priority: priority, duration: duration).data
+    open func writeActivateMotor(velocity: Int, acceralation: Int, angularVelocity: Int, priority: MotorAcceralationPriority, duration: TimeInterval) {
+        let data = MotorActivateWithAcceralationRequest(velocity: velocity, acceralation: acceralation, angularVelocity: angularVelocity, priority: priority, duration: duration).data
         writeCharacteristic(Cube.CHR_MOTOR, data: data, nil)
     }
 
@@ -752,8 +752,8 @@ open class Cube {
     ///   - interval:   minimum notify interval in 0.00 to 2.55 seconds.
     ///   - condition:  condition to notify.
     ///   - callback:   callback after write succeeded.
-    open func writeConfigurationSensorIdFrequency(interval: TimeInterval, condition: ConfigurationSensorIdNotifyCondition, callback: @escaping (Result<Succeeded,Error>)->()) {
-        let data = ConfigurationSensorIdFrequencyRequest(interval: interval, condition: condition).data
+    open func writeConfigurationIdNotificationFrequency(interval: TimeInterval, condition: ConfigurationIdNotificationCondition, callback: @escaping (Result<Succeeded,Error>)->()) {
+        let data = ConfigurationIdNotificationFrequencyRequest(interval: interval, condition: condition).data
         writeCharacteristic(Cube.CHR_CONFIGURATION, data: data, callback)
     }
 
@@ -762,8 +762,8 @@ open class Cube {
     /// - Parameters:
     ///   - value:      threshold time to determined as "ID missed" in 0.00 to 2.55 seconds.
     ///   - callback:   callback after write succeeded.
-    open func writeConfigurationSensorIdMissedThreshold(value: TimeInterval, callback: @escaping (Result<Succeeded,Error>)->()) {
-        let data = ConfigurationSensorIdMissedThresholdRequest(value: value).data
+    open func writeConfigurationIdMissedThreshold(_ time: TimeInterval, callback: @escaping (Result<Succeeded,Error>)->()) {
+        let data = ConfigurationIdMissedThresholdRequest(time: time).data
         writeCharacteristic(Cube.CHR_CONFIGURATION, data: data, callback)
     }
 
@@ -772,8 +772,8 @@ open class Cube {
     /// - Parameters:
     ///   - value:      availability.
     ///   - callback:   callback after write succeeded.
-    open func writeConfigurationSensorMagneticAvailability(value: Bool, callback: @escaping (Result<Succeeded,Error>)->()) {
-        let data = ConfigurationSensorMagneticAvailabilityRequest(value: value).data
+    open func writeConfigurationMagneticSensorAvailability(_ value: Bool, callback: @escaping (Result<Succeeded,Error>)->()) {
+        let data = ConfigurationMagneticSensorAvailabilityRequest(value: value).data
         writeCharacteristic(Cube.CHR_CONFIGURATION, data: data, callback)
     }
 
@@ -782,7 +782,7 @@ open class Cube {
     /// - Parameters:
     ///   - value:      availability.
     ///   - callback:   callback after write succeeded.
-    open func writeConfigurationMotorVelocityAvailability(value: Bool, callback: @escaping (Result<Succeeded,Error>)->()) {
+    open func writeConfigurationMotorVelocityAvailability(_ value: Bool, callback: @escaping (Result<Succeeded,Error>)->()) {
         let data = ConfigurationMotorVelocityAvailabilityRequest(value: value).data
         writeCharacteristic(Cube.CHR_CONFIGURATION, data: data, callback)
     }

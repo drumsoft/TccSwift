@@ -34,7 +34,7 @@ class CubeControllerPage: UIViewController, CubeDelegate {
             }
         }
         
-        cube.writeConfigurationSensorMagneticAvailability(value: true) {
+        cube.writeConfigurationMagneticSensorAvailability(true) {
             switch $0 {
             case .failure(let error): self.alertError(error)
             case .success(_): break
@@ -66,10 +66,10 @@ class CubeControllerPage: UIViewController, CubeDelegate {
             case let r as ConfigurationBLEProtocolVersionResponse:
                 bleProtocolVersion = r.version
                 statusUpdated()
-            case let r as ConfigurationIdNotifyFrequencyResponse:
-                print("Config IdNotifyFrequency: \(r.isSucceeded ? "succeeded" : "failed")")
-            case let r as ConfigurationIdMissedNotifyThresholdResponse:
-                print("Config IdMissedNotifyThreshold: \(r.isSucceeded ? "succeeded" : "failed")")
+            case let r as ConfigurationIdNotificationFrequencyResponse:
+                print("Config IdNotificationFrequency: \(r.isSucceeded ? "succeeded" : "failed")")
+            case let r as ConfigurationIdMissedThresholdResponse:
+                print("Config IdMissedThreshold: \(r.isSucceeded ? "succeeded" : "failed")")
             case let r as ConfigurationMagneticSensorAvailabilityResponse:
                 print("Config MagneticSensorAvailability: \(r.isSucceeded ? "succeeded" : "failed")")
             case let r as ConfigurationMotorVelocityAvailabilityResponse:

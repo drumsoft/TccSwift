@@ -40,6 +40,11 @@ public struct SoundNoteUnit {
     let duration:TimeInterval // in sec
     let note:Int // 0 to 127, 57 = A4 440Hz, 128 = mute
     let volume: Double // 0.0 to 1.0
+    public init(duration:TimeInterval, note:Int, volume: Double) {
+        self.duration = duration
+        self.note = note
+        self.volume = volume
+    }
     var data:Data {
         Data([
             UInt8(self.duration * 100),

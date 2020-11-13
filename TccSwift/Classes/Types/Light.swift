@@ -14,6 +14,12 @@ public struct LightOnUnit {
     let red:Double // 0.0 to 1.0
     let green:Double // 0.0 to 1.0
     let blue:Double // 0.0 to 1.0
+    public init(duration:TimeInterval, red:Double, green:Double, blue:Double) {
+        self.duration = duration
+        self.red = red
+        self.green = green
+        self.blue = blue
+    }
     var data:Data {
         Data([
             UInt8(floor(self.duration * 100)),

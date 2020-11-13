@@ -36,28 +36,28 @@ struct ConfigurationSensorDoubleTapIntervalRequest {
     }
 }
 
-public enum ConfigurationSensorIdNotifyCondition: Int {
+public enum ConfigurationIdNotificationCondition: Int {
     case always = 0 // notify always.
     case onValueChanged = 1 // notify when values changed.
     case atLeast300millisec = 2 // notify when values changed and after 300 millisec interval.
 }
 
-struct ConfigurationSensorIdFrequencyRequest {
+struct ConfigurationIdNotificationFrequencyRequest {
     let interval: TimeInterval
-    let condition: ConfigurationSensorIdNotifyCondition
+    let condition: ConfigurationIdNotificationCondition
     var data:Data {
         Data([UInt8(0x18), UInt8(0), UInt8(interval * 100), UInt8(condition.rawValue)])
     }
 }
 
-struct ConfigurationSensorIdMissedThresholdRequest {
-    let value: TimeInterval
+struct ConfigurationIdMissedThresholdRequest {
+    let time: TimeInterval
     var data:Data {
-        Data([UInt8(0x19), UInt8(0), UInt8(round(value * 100))])
+        Data([UInt8(0x19), UInt8(0), UInt8(round(time * 100))])
     }
 }
 
-struct ConfigurationSensorMagneticAvailabilityRequest {
+struct ConfigurationMagneticSensorAvailabilityRequest {
     let value: Bool
     var data:Data {
         Data([UInt8(0x1b), UInt8(0), UInt8(value ? 1 : 0)])
@@ -76,8 +76,8 @@ public class ConfigurationResponse: TccResponse {
     static func parse(_ data: Data) -> ConfigurationResponse? {
         switch data[0] {
         case 0x81:  return ConfigurationBLEProtocolVersionResponse(data)
-        case 0x98:  return ConfigurationIdNotifyFrequencyResponse(data)
-        case 0x99:  return ConfigurationIdMissedNotifyThresholdResponse(data)
+        case 0x98:  return ConfigurationIdNotificationFrequencyResponse(data)
+        case 0x99:  return ConfigurationIdMissedThresholdResponse(data)
         case 0x9b:  return ConfigurationMagneticSensorAvailabilityResponse(data)
         case 0x9c:  return ConfigurationMotorVelocityAvailabilityResponse(data)
         default:    return nil
@@ -92,14 +92,14 @@ public class ConfigurationBLEProtocolVersionResponse: ConfigurationResponse {
     }
 }
 
-public class ConfigurationIdNotifyFrequencyResponse: ConfigurationResponse {
+public class ConfigurationIdNotificationFrequencyResponse: ConfigurationResponse {
     public let isSucceeded: Bool
     init(_ data:Data) {
         isSucceeded = data[2] == 0
     }
 }
 
-public class ConfigurationIdMissedNotifyThresholdResponse: ConfigurationResponse {
+public class ConfigurationIdMissedThresholdResponse: ConfigurationResponse {
     public let isSucceeded: Bool
     init(_ data:Data) {
         isSucceeded = data[2] == 0
