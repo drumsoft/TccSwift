@@ -185,8 +185,8 @@ open class Cube {
         let chr_id = characteristic.uuid
         if error != nil {
             if notifyWaiting[chr_id] != nil && notifyWaiting[chr_id]!.count > 0 {
-                for waiting in notifyWaiting[chr_id]! {
-                    callbackResult(nil, error!, to: waiting, for: chr_id)
+                for id_waiting in notifyWaiting[chr_id]! {
+                    callbackResult(nil, error!, to: id_waiting.waiting, for: chr_id)
                 }
             } else {
                 didReceivedUnhandledError(error!)
@@ -208,8 +208,8 @@ open class Cube {
         }
         // notify callbacks
         if notifyWaiting[chr_id] != nil && notifyWaiting[chr_id]!.count > 0 {
-            for waiting in notifyWaiting[chr_id]! {
-                callbackResult(result, error, to: waiting, for: chr_id)
+            for id_waiting in notifyWaiting[chr_id]! {
+                callbackResult(result, error, to: id_waiting.waiting, for: chr_id)
             }
             callbacked = true
         }
@@ -261,7 +261,6 @@ open class Cube {
     private var seed:UInt = 1
     
     private struct Waiting<ResultType:TccResponse> {
-        var id: UInt
         var callback:(Result<ResultType,Error>)->()
         func success(_ value:TccResponse) {
             if value is ResultType {
@@ -276,7 +275,7 @@ open class Cube {
     }
     
     private var readWaiting:[CBUUID:[Any]] = [:]
-    private var notifyWaiting:[CBUUID:[Any]] = [:]
+    private var notifyWaiting:[CBUUID:[(id:UInt, waiting:Any)]] = [:]
     private var writeWaiting:[CBUUID:[Any]] = [:]
     
     private func callbackResult(_ result:TccResponse? = nil, _ error:Error? = nil, to waiting:Any, for chr_id:CBUUID) {
@@ -328,7 +327,7 @@ open class Cube {
         let isNew = readWaiting[charid] == nil || readWaiting[charid]!.count == 0
         if readWaiting[charid] == nil { readWaiting[charid] = [] }
         readWaiting[charid]!.append(
-            Waiting(id: 0, callback: callback)
+            Waiting(callback: callback)
         )
         if isNew {
             peripheral.readValue(for: characteristic)
@@ -342,7 +341,7 @@ open class Cube {
         if callback != nil {
             if writeWaiting[charid] == nil { writeWaiting[charid] = [] }
             writeWaiting[charid]!.append(
-                Waiting(id: 0, callback: callback!)
+                Waiting(callback: callback!)
             )
         }
         peripheral.writeValue(data, for: characteristic, type: callback != nil ? .withResponse : .withoutResponse)
@@ -357,7 +356,7 @@ open class Cube {
         let id = seed
         seed += 1
         notifyWaiting[charid]!.append(
-            Waiting(id: id, callback: callback)
+            (id: id, waiting: Waiting(callback: callback))
         )
         if isNew {
             peripheral.setNotifyValue(true, for: characteristic)
@@ -369,7 +368,7 @@ open class Cube {
             return
         }
         if notifyWaiting[charid] != nil {
-            if let i = (notifyWaiting[charid]!.firstIndex{ ($0 as? Waiting<TccResponse>)?.id == id }) {
+            if let i = (notifyWaiting[charid]!.firstIndex{ $0.id == id }) {
                 notifyWaiting[charid]!.remove(at: i)
             }
         }
