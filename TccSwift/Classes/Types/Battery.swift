@@ -15,7 +15,7 @@ public class BatteryResponse: TccResponse {
     }
     
     /// the battery capacity in percent. 0 to 100
-    public var capacity: Int
+    public let capacity: Int
     init(_ data:Data) {
         capacity = Int(data[0])
     }

@@ -57,25 +57,34 @@ public class SensorResponse: TccResponse {
 }
 
 public class SensorMotionResponse: SensorResponse {
-    public var isLevel:Bool
-    public var isCollided:Bool
-    public var isDoubleTapped:Bool
+    public let isLevel:Bool
+    public let isCollided:Bool
+    public let isDoubleTapped:Bool
     /// which side faces up?
-    public var orientation:SensorOrientation
+    public let orientation:SensorOrientation
     /// 0 is not shaken. 1 to 10 is shaken.
-    public var shaken:Int
+    public let shaken:Int
     init(_ data:Data) {
         isLevel = data[1] != 0 // 1: level, 0: not level
         isCollided = data[2] != 0 // 1: collided, 0: not collided
-        isDoubleTapped = data[3] != 0 // 1: doubletapped, 0: not doubletapped
-        orientation = SensorOrientation.init(rawValue: Int(data[4])) ?? .unknown
-        shaken = data.count >= 6 ? Int(data[5]) : 0
+        if data.count >= 5 {
+            isDoubleTapped = data[3] != 0 // 1: doubletapped, 0: not doubletapped
+            orientation = SensorOrientation.init(rawValue: Int(data[4])) ?? .unknown
+        } else {
+            isDoubleTapped = false
+            orientation = .unknown
+        }
+        if data.count >= 6 {
+            shaken = Int(data[5])
+        } else {
+            shaken = 0
+        }
     }
 }
 
 public class SensorMagneticResponse: SensorResponse {
     /// position of the magnet.
-    public var position: SensorMagnetPosition
+    public let position: SensorMagnetPosition
     init(_ data:Data) {
         position = SensorMagnetPosition.init(rawValue: Int(data[1])) ?? .unknown
     }

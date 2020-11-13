@@ -16,21 +16,21 @@ struct ConfigurationRequestBLEProtocolVersionRequest {
 }
 
 struct ConfigurationSensorLevelThresholdRequest {
-    var value: Int // in degree, 1 to 45
+    let value: Int // in degree, 1 to 45
     var data:Data {
         Data([UInt8(0x05), UInt8(0), UInt8(value)])
     }
 }
 
 struct ConfigurationSensorCollisionThresholdRequest {
-    var value: Int // collision level, 1 to 10
+    let value: Int // collision level, 1 to 10
     var data:Data {
         Data([UInt8(0x06), UInt8(0), UInt8(value)])
     }
 }
 
 struct ConfigurationSensorDoubleTapIntervalRequest {
-    var value: Int // double tap interval, 0 to 10
+    let value: Int // double tap interval, 0 to 10
     var data:Data {
         Data([UInt8(0x17), UInt8(0), UInt8(value)])
     }
@@ -43,29 +43,29 @@ public enum ConfigurationSensorIdNotifyCondition: Int {
 }
 
 struct ConfigurationSensorIdFrequencyRequest {
-    var interval: TimeInterval
-    var condition: ConfigurationSensorIdNotifyCondition
+    let interval: TimeInterval
+    let condition: ConfigurationSensorIdNotifyCondition
     var data:Data {
         Data([UInt8(0x18), UInt8(0), UInt8(interval * 100), UInt8(condition.rawValue)])
     }
 }
 
 struct ConfigurationSensorIdMissedThresholdRequest {
-    var value: TimeInterval
+    let value: TimeInterval
     var data:Data {
         Data([UInt8(0x19), UInt8(0), UInt8(round(value * 100))])
     }
 }
 
 struct ConfigurationSensorMagneticAvailabilityRequest {
-    var value: Bool
+    let value: Bool
     var data:Data {
         Data([UInt8(0x1b), UInt8(0), UInt8(value ? 1 : 0)])
     }
 }
 
 struct ConfigurationMotorVelocityAvailabilityRequest {
-    var value: Bool
+    let value: Bool
     var data:Data {
         Data([UInt8(0x1c), UInt8(0), UInt8(value ? 1 : 0)])
     }
@@ -86,35 +86,35 @@ public class ConfigurationResponse: TccResponse {
 }
 
 public class ConfigurationBLEProtocolVersionResponse: ConfigurationResponse {
-    public var version:String?
+    public let version:String?
     init(_ data:Data) {
         version = String(data: data.subdata(in: 2..<(data.count)), encoding: .utf8)
     }
 }
 
 public class ConfigurationIdNotifyFrequencyResponse: ConfigurationResponse {
-    public var isSucceeded: Bool
+    public let isSucceeded: Bool
     init(_ data:Data) {
         isSucceeded = data[2] == 0
     }
 }
 
 public class ConfigurationIdMissedNotifyThresholdResponse: ConfigurationResponse {
-    public var isSucceeded: Bool
+    public let isSucceeded: Bool
     init(_ data:Data) {
         isSucceeded = data[2] == 0
     }
 }
 
 public class ConfigurationMagneticSensorAvailabilityResponse: ConfigurationResponse {
-    public var isSucceeded: Bool
+    public let isSucceeded: Bool
     init(_ data:Data) {
         isSucceeded = data[2] == 0
     }
 }
 
 public class ConfigurationMotorVelocityAvailabilityResponse: ConfigurationResponse {
-    public var isSucceeded: Bool
+    public let isSucceeded: Bool
     init(_ data:Data) {
         isSucceeded = data[2] == 0
     }

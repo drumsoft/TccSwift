@@ -58,8 +58,8 @@ public enum MotorAcceralationPriority: Int {
 
 /// parameter for activate motor
 struct MotorActivateRequest {
-    var left: Int // -115 to -8 = backward, -7 to 7 = stop, 8 to 115 = forward (up to 494 rpm)
-    var right: Int
+    let left: Int // -115 to -8 = backward, -7 to 7 = stop, 8 to 115 = forward (up to 494 rpm)
+    let right: Int
     var data:Data {
         Data([
             UInt8(0x01),
@@ -75,9 +75,9 @@ struct MotorActivateRequest {
 
 /// parameter for activate motor with duration
 struct MotorActivateWithDurationRequest {
-    var left: Int // -115 to -8 = backward, -7 to 7 = stop, 8 to 115 = forward (up to 494 rpm)
-    var right: Int
-    var duration: TimeInterval
+    let left: Int // -115 to -8 = backward, -7 to 7 = stop, 8 to 115 = forward (up to 494 rpm)
+    let right: Int
+    let duration: TimeInterval
     var data:Data {
         Data([
             UInt8(0x02),
@@ -93,10 +93,10 @@ struct MotorActivateWithDurationRequest {
 }
 
 public struct MotorDestinationUnit {
-    var destinationX: Int
-    var destinationY: Int
-    var finalRotation: Int
-    var finalRotationType: MotorDestinationFinalRotation
+    let destinationX: Int
+    let destinationY: Int
+    let finalRotation: Int
+    let finalRotationType: MotorDestinationFinalRotation
     var data:Data {
         var rotType = finalRotationType
         if finalRotation < 0 {
@@ -122,12 +122,12 @@ public struct MotorDestinationUnit {
 
 /// parameter for moving to destination
 struct MotorMoveToDestinationRequest {
-    var id: Int
-    var timeout: TimeInterval // in seconds. 0 means 10 seconds.
-    var curve: MotorDestinationCurve
-    var maxVelocity: Int
-    var easing: MotorDestinationEasing
-    var destination:MotorDestinationUnit
+    let id: Int
+    let timeout: TimeInterval // in seconds. 0 means 10 seconds.
+    let curve: MotorDestinationCurve
+    let maxVelocity: Int
+    let easing: MotorDestinationEasing
+    let destination:MotorDestinationUnit
     var data:Data {
         Data([
             UInt8(0x03),
@@ -143,13 +143,13 @@ struct MotorMoveToDestinationRequest {
 
 /// parameter for moving to multiple destination
 struct MotorMoveToMultipleDestinationRequest {
-    var id: Int
-    var timeout: TimeInterval // in seconds. 0 means 10 seconds.
-    var curve: MotorDestinationCurve
-    var maxVelocity: Int
-    var easing: MotorDestinationEasing
-    var writeMode: MotorDestinationWriteMode
-    var destinations:[MotorDestinationUnit]
+    let id: Int
+    let timeout: TimeInterval // in seconds. 0 means 10 seconds.
+    let curve: MotorDestinationCurve
+    let maxVelocity: Int
+    let easing: MotorDestinationEasing
+    let writeMode: MotorDestinationWriteMode
+    let destinations:[MotorDestinationUnit]
     var data:Data {
         Data([
             UInt8(0x03),
@@ -166,11 +166,11 @@ struct MotorMoveToMultipleDestinationRequest {
 
 /// parameter for moving with acceralation
 struct MotorMoveWithAcceralationRequest {
-    var velocity: Int
-    var acceralation: Int // Δvelocity / Δ(100ms), 0 means immediately set to specified velocity.
-    var angularVelocity: Int // 0 to 65535, degree/sec
-    var priority: MotorAcceralationPriority
-    var duration: TimeInterval // in seconds (set with x 10ms)
+    let velocity: Int
+    let acceralation: Int // Δvelocity / Δ(100ms), 0 means immediately set to specified velocity.
+    let angularVelocity: Int // 0 to 65535, degree/sec
+    let priority: MotorAcceralationPriority
+    let duration: TimeInterval // in seconds (set with x 10ms)
     var data:Data {
         Data([
             UInt8(0x05),
@@ -199,8 +199,8 @@ public class MotorResponse: TccResponse {
 }
 
 public class MotorDestinationResultResponse: MotorResponse {
-    public var id: Int
-    public var status: MotorDestinationStatus
+    public let id: Int
+    public let status: MotorDestinationStatus
     
     init(_ data:Data) {
         id = Int(data[1])
@@ -209,8 +209,8 @@ public class MotorDestinationResultResponse: MotorResponse {
 }
 
 public class MotorMultipleDestinationResultResponse: MotorResponse {
-    public var id: Int
-    public var status: MotorDestinationStatus
+    public let id: Int
+    public let status: MotorDestinationStatus
     
     init(_ data:Data) {
         id = Int(data[1])
@@ -219,8 +219,8 @@ public class MotorMultipleDestinationResultResponse: MotorResponse {
 }
 
 public class MotorVelocitiesResponse: MotorResponse {
-    public var left:Int
-    public var right:Int
+    public let left:Int
+    public let right:Int
     
     init(_ data:Data) {
         left = Int(data[1])

@@ -25,8 +25,8 @@ public enum SoundEffect: Int {
 
 /// parameter for play sound
 struct SoundPlayRequest {
-    var se: SoundEffect
-    var volume: Double // 0.0 to 1.0
+    let se: SoundEffect
+    let volume: Double // 0.0 to 1.0
     var data:Data {
         Data([
             UInt8(0x02),
@@ -37,9 +37,9 @@ struct SoundPlayRequest {
 }
 
 public struct SoundNoteUnit {
-    var duration:TimeInterval // in sec
-    var note:Int // 0 to 127, 57 = A4 440Hz, 128 = mute
-    var volume: Double // 0.0 to 1.0
+    let duration:TimeInterval // in sec
+    let note:Int // 0 to 127, 57 = A4 440Hz, 128 = mute
+    let volume: Double // 0.0 to 1.0
     var data:Data {
         Data([
             UInt8(self.duration * 100),
@@ -51,8 +51,8 @@ public struct SoundNoteUnit {
 
 /// parameter for play notes.
 struct SoundPlayNotesRequest {
-    var repeats: Int // 0 to infinite loop
-    var sequence:[SoundNoteUnit]
+    let repeats: Int // 0 to infinite loop
+    let sequence:[SoundNoteUnit]
     var data:Data {
         Data(
             [UInt8(0x03), UInt8(repeats), UInt8(sequence.count)]
