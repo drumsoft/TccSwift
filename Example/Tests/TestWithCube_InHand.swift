@@ -10,31 +10,54 @@ import Quick
 import Nimble
 import TccSwift
 
+fileprivate let BANNER = "== \"In Hand\" Test: Power on and keep the Core Cube in your hand to start the test. =="
+
 class TestWithCube_InHand: QuickSpec {
     override func spec() {
         
-        var cube:Cube?
+        var cube:Cube!
         
-        print("\"In Hand\" Test: Power on and keep the Core Cube in your hand to start the test.")
+        beforeSuite {
+            print(BANNER)
+            cube = testInitializeCube()
+        }
         
-        beforeSuite({
-            let cubeManager = CubeManager()
-            let cubeManagerDelegate = TestCubeManagerDelegate()
-            cubeManager.delegate = cubeManagerDelegate
-            waitUntil(timeout: DEFAULT_TIMEOUT_FOR_HUMAN) { done in
-                cubeManagerDelegate.onFound = done
-                cubeManager.startScan()
-            }
-            cubeManager.stopScan()
-            cube = cubeManager.foundCubeEntries.first
-        })
+        afterSuite {
+            testFinalizeCube(cube)
+        }
         
         describe("Cube") {
+            context("Motion Sensors") {
+                
+                it("Read Motion Sensor Value") {
+                    waitUntil(timeout:DEFAULT_TIMEOUT_FOR_HUMAN) { done in
+                        cube?.readSensor {
+                            expect($0).to(succeededWith(SensorMotionResponse.self))
+                            done()
+                        }
+                        print("-- Knock the Core Cube. --")
+                    }
+                }
+                
+                it("Notified Motion Sensor Value") {
+                    waitUntil(timeout:DEFAULT_TIMEOUT_FOR_HUMAN) { done in
+                        var id:UInt? = nil
+                        id = cube?.startNotifySensor() {
+                            expect($0).to(succeededWith(SensorMotionResponse.self))
+                            cube?.stopNotifySensor(id!)
+                            done()
+                        }
+                        print("-- Knock the Core Cube. --")
+                    }
+                }
+                
+            }
+
             context("Button") {
                 it("Read Button Values") {
                     waitUntil(timeout:DEFAULT_TIMEOUT_FOR_HUMAN) { done in
                         cube?.readButton {
-                            testResult($0, as: ButtonResponse.self)
+                            expect($0).to(succeededWith(ButtonFunctionResponse.self))
                             done()
                         }
                         print("-- Press function button on the Core Cube. --")
@@ -44,7 +67,7 @@ class TestWithCube_InHand: QuickSpec {
                     waitUntil(timeout:DEFAULT_TIMEOUT_FOR_HUMAN) { done in
                         var id:UInt? = nil
                         id = cube?.startNotifyButton() {
-                            testResult($0, as: ButtonResponse.self)
+                            expect($0).to(succeededWith(ButtonFunctionResponse.self))
                             cube?.stopNotifyButton(id!)
                             done()
                         }

@@ -14,6 +14,7 @@
 		0D660903255E56FB0026AEB3 /* TestWithCube_InHand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D660902255E56FB0026AEB3 /* TestWithCube_InHand.swift */; };
 		0D660907255E570A0026AEB3 /* TestWithCube_OnMat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D660906255E570A0026AEB3 /* TestWithCube_OnMat.swift */; };
 		0D66090B255E57240026AEB3 /* TestWithCube_v2_2_0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D66090A255E57240026AEB3 /* TestWithCube_v2_2_0.swift */; };
+		0D66091B255ECD9F0026AEB3 /* TestWithCube_Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D66091A255ECD9F0026AEB3 /* TestWithCube_Manager.swift */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
@@ -41,6 +42,7 @@
 		0D660902255E56FB0026AEB3 /* TestWithCube_InHand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestWithCube_InHand.swift; sourceTree = "<group>"; };
 		0D660906255E570A0026AEB3 /* TestWithCube_OnMat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestWithCube_OnMat.swift; sourceTree = "<group>"; };
 		0D66090A255E57240026AEB3 /* TestWithCube_v2_2_0.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestWithCube_v2_2_0.swift; sourceTree = "<group>"; };
+		0D66091A255ECD9F0026AEB3 /* TestWithCube_Manager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestWithCube_Manager.swift; sourceTree = "<group>"; };
 		151A2A0E0CD6F4C3D8272644 /* TccSwift.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = TccSwift.podspec; path = ../TccSwift.podspec; sourceTree = "<group>"; };
 		2C6A4A528C57F3DFA74BF7AF /* Pods_TccSwift_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TccSwift_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4462F2DCABBDE5FE46D922CB /* Pods-TccSwift_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TccSwift_Example.release.xcconfig"; path = "Target Support Files/Pods-TccSwift_Example/Pods-TccSwift_Example.release.xcconfig"; sourceTree = "<group>"; };
@@ -146,11 +148,12 @@
 		607FACE81AFB9204008FA782 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				0D6608FE255E56B00026AEB3 /* TestUtil.swift */,
+				0D66091A255ECD9F0026AEB3 /* TestWithCube_Manager.swift */,
 				0D6608DE255BA0FA0026AEB3 /* TestWithCube_Basic.swift */,
 				0D660902255E56FB0026AEB3 /* TestWithCube_InHand.swift */,
 				0D660906255E570A0026AEB3 /* TestWithCube_OnMat.swift */,
 				0D66090A255E57240026AEB3 /* TestWithCube_v2_2_0.swift */,
-				0D6608FE255E56B00026AEB3 /* TestUtil.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
 			);
 			path = Tests;
@@ -395,6 +398,7 @@
 				0D660903255E56FB0026AEB3 /* TestWithCube_InHand.swift in Sources */,
 				0D6608DF255BA0FA0026AEB3 /* TestWithCube_Basic.swift in Sources */,
 				0D6608FF255E56B00026AEB3 /* TestUtil.swift in Sources */,
+				0D66091B255ECD9F0026AEB3 /* TestWithCube_Manager.swift in Sources */,
 				0D66090B255E57240026AEB3 /* TestWithCube_v2_2_0.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

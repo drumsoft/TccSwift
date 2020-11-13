@@ -20,20 +20,85 @@ class TestCubeManagerDelegate: CubeManagerDelegate {
     }
 }
 
-func testResult<Type>(_ result:Result<Type,Error>) {
-    switch result {
-    case .success(_):
-        break // ok
-    case .failure(let error):
-        fail(error.localizedDescription)
+func testInitializeCube() -> Cube {
+    var cube:Cube? = nil
+    
+    let cubeManager = CubeManager()
+    let cubeManagerDelegate = TestCubeManagerDelegate()
+    cubeManager.delegate = cubeManagerDelegate
+    
+    waitUntil(timeout: DEFAULT_TIMEOUT_FOR_HUMAN) { done in
+        cubeManagerDelegate.onFound = done
+        cubeManager.startScan()
+    }
+    
+    cubeManager.stopScan()
+    cube = cubeManager.foundCubeEntries.first
+    
+    waitUntil { done in
+        cube!.connect {
+            switch $0 {
+            case .success(_):
+                done()
+            case .failure(let error):
+                fail(error.localizedDescription)
+            }
+        }
+    }
+    
+    return cube!
+}
+
+func testFinalizeCube(_ cube:Cube) {
+    cube.disconnect()
+}
+
+public func succeeded<Type>() -> Predicate<Result<Type,Error>> {
+    let errorMessage = "suceeded"
+    return Predicate.define { (actualExpression:Expression<Result<Type,Error>>) in
+        if let instance = try actualExpression.evaluate() {
+            switch instance {
+            case .success(_):
+                return PredicateResult(
+                    status: .matches,
+                    message: .expectedTo("succeeded")
+                )
+            case .failure(let error):
+                return PredicateResult(
+                    status: .doesNotMatch,
+                    message: .expectedCustomValueTo(errorMessage, "<Error: \(error.localizedDescription)>")
+                )
+            }
+        } else {
+            return PredicateResult(
+                status: .doesNotMatch,
+                message: .expectedActualValueTo(errorMessage)
+            )
+        }
     }
 }
 
-func testResult<Type,T>(_ result:Result<Type,Error>, as type:T.Type) {
-    switch result {
-    case .success(let r):
-        expect(r).to(beAnInstanceOf(type))
-    case .failure(let error):
-        fail(error.localizedDescription)
+public func succeededWith<Type,T>(_ expectedType: T.Type) -> Predicate<Result<Type,Error>> {
+    let errorMessage = "suceeded with instance of \(String(describing: expectedType))"
+    return Predicate.define { (actualExpression:Expression<Result<Type,Error>>) in
+        if let instance = try actualExpression.evaluate() {
+            switch instance {
+            case .success(let r):
+                return PredicateResult(
+                    status: PredicateStatus(bool: type(of: r) == expectedType),
+                    message: .expectedCustomValueTo(errorMessage, ".success(\(String(describing: type(of: r))))")
+                )
+            case .failure(let error):
+                return PredicateResult(
+                    status: .doesNotMatch,
+                    message: .expectedCustomValueTo(errorMessage, ".failure(\(error.localizedDescription))")
+                )
+            }
+        } else {
+            return PredicateResult(
+                status: .doesNotMatch,
+                message: .expectedActualValueTo(errorMessage)
+            )
+        }
     }
 }
