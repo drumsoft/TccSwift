@@ -49,9 +49,10 @@ class CubeControllerPage: UIViewController, CubeDelegate {
         labelIdentifier.text = cube.identifierString
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        cube.disconnect()
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        cube.delegate = nil
+        cube.disconnect(nil)
     }
     
     // MARK: configuration
@@ -277,11 +278,21 @@ class CubeControllerPage: UIViewController, CubeDelegate {
         self.alertError(error)
     }
     
+    func cube(_ cube: Cube, didDisconnectedWith error: Error?) {
+        if error != nil {
+            alertError(error!) {
+                self.navigationController?.popViewController(animated: true)
+            }
+        } else {
+            self.navigationController?.popViewController(animated: true)
+        }
+    }
+    
     // MARK: Alert
     
-    func alertError(_ error:Error) {
+    func alertError(_ error:Error, onOkPressed:(()->())? = nil) {
         let alertController = UIAlertController(title: "Error from Cube", message: error.localizedDescription, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: "OK", style: .default))
-        self.present(alertController, animated: true, completion: nil)
+        alertController.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in onOkPressed?() }))
+        self.present(alertController, animated: true)
     }
 }

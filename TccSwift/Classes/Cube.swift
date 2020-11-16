@@ -11,6 +11,7 @@ import CoreBluetooth
 /// Delegate to receive unhandled error.
 public protocol CubeDelegate {
     func cube(_ cube: Cube, didReceivedUnhandled error: Error)
+    func cube(_ cube: Cube, didDisconnectedWith error: Error? )
 }
 
 /// Core Cube class
@@ -63,7 +64,8 @@ open class Cube {
     
     private var connectionCallback:((Result<Cube,Error>)->())?
     private var connectionTimer:Timer?
-    
+    private var disconnectionCallback:((Error?)->())?
+
     /// Connect to Cube
     ///
     /// - Parameters:
@@ -79,15 +81,15 @@ open class Cube {
     }
     
     /// disconnect from Cube
-    /// if disconnected while connection, connection callback will receive TccError.disconnectedWhileConnection error.
-    open func disconnect() {
-        manager.disconnectFromCube(self)
+    /// These callback/handler will be called after disconnect completed (In this order).
+    /// - if disconnected while connection, connection callback will receive ??? error.
+    /// - the callback for disconnect.
+    /// - the disconnect handler of cube delegate.
+    open func disconnect(_ callback: ((Error?)->())?) {
+        disconnectionCallback = callback
         connectionTimer?.invalidate()
         connectionTimer = nil
-        if let cb = connectionCallback {
-            connectionCallback = nil
-            cb(Result.failure(TccError.disconnectedWhileConnection))
-        }
+        manager.disconnectFromCube(self)
     }
     
     internal func onConnected() {
@@ -105,6 +107,8 @@ open class Cube {
         if let cb = connectionCallback {
             connectionCallback = nil
             cb(Result.failure(error))
+        } else {
+            delegate?.cube(self, didReceivedUnhandled: error)
         }
     }
     
@@ -115,6 +119,11 @@ open class Cube {
             connectionCallback = nil
             cb(Result.failure(error ?? TccError.disconnectedWhileConnection))
         }
+        if let cb = disconnectionCallback {
+            disconnectionCallback = nil
+            cb(error)
+        }
+        delegate?.cube(self, didDisconnectedWith: error)
     }
     
     internal func onConnectionSucceeded() {
@@ -139,12 +148,12 @@ open class Cube {
         public func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
             guard error == nil else {
                 cube.onConnectionFailed(error!)
-                cube.disconnect()
+                cube.disconnect(nil)
                 return
             }
             guard peripheral.services != nil && (SERVICES.allSatisfy{ serviceUUID in peripheral.services!.contains{ $0.uuid == serviceUUID } }) else {
                 cube.onConnectionFailed(TccError.requiredServiceNotFound)
-                cube.disconnect()
+                cube.disconnect(nil)
                 return
             }
             for service in peripheral.services! {
@@ -156,7 +165,7 @@ open class Cube {
         public func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
             guard error == nil else {
                 cube.onConnectionFailed(error!)
-                cube.disconnect()
+                cube.disconnect(nil)
                 return
             }
             for characteristic in service.characteristics! {
@@ -167,7 +176,7 @@ open class Cube {
         
         /// "Notify" result callback
         public func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
-            // characteristic.isNotifying ? notify subscribed : canceled.
+            cube.didUpdateNotificationStateFor(characteristic: characteristic, error: error)
         }
         
         /// "Read" or "Notify" callback

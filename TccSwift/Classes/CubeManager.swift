@@ -76,7 +76,7 @@ open class CubeManager {
     /// disconnect request from cube
     internal func disconnectFromCube(_ cube: Cube) {
         centralManager?.cancelPeripheralConnection(cube.peripheral)
-        _connectingCubeEntries.removeValue(forKey: cube.peripheral.identifier)
+        // will didDisconnectPeripheral be called?
     }
     
     // MARK: Work with peripheral connection events.
