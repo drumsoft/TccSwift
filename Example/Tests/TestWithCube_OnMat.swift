@@ -10,8 +10,7 @@ import Quick
 import Nimble
 import TccSwift
 
-fileprivate let BANNER = "== \"On Mat\" Test: Power on and place the Core Cube on Play Mat to start the test. =="
-
+/// "On Mat" Test: Power on and place the Core Cube on Play Mat to start the test.
 class TestWithCube_OnMat: QuickSpec {
     var destinationId:Int = 0
     var responseId:Int = -1
@@ -25,9 +24,8 @@ class TestWithCube_OnMat: QuickSpec {
         
         var notifyId:UInt?
         
-        beforeSuite {
-            print(BANNER)
-            cube = testInitializeCube()
+        beforeEach {
+            cube = TestCubeProvider.initialize()
             
             // receive destination result
             notifyId = cube.startNotifyMotor {
@@ -45,9 +43,12 @@ class TestWithCube_OnMat: QuickSpec {
             }
         }
         
-        afterSuite {
+        afterEach {
             cube.stopNotifyMotor(notifyId!)
-            testFinalizeCube(cube)
+        }
+        
+        afterSuite {
+            TestCubeProvider.finalize()
         }
         
         describe("Cube") {

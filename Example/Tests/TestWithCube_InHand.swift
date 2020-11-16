@@ -10,20 +10,18 @@ import Quick
 import Nimble
 import TccSwift
 
-fileprivate let BANNER = "== \"In Hand\" Test: Power on and keep the Core Cube in your hand to start the test. =="
-
+/// "In Hand" Test: Power on and keep the Core Cube in your hand to start the test.
 class TestWithCube_InHand: QuickSpec {
     override func spec() {
         
         var cube:Cube!
         
-        beforeSuite {
-            print(BANNER)
-            cube = testInitializeCube()
+        beforeEach {
+            cube = TestCubeProvider.initialize()
         }
         
         afterSuite {
-            testFinalizeCube(cube)
+            TestCubeProvider.finalize()
         }
         
         describe("Cube") {

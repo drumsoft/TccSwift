@@ -10,8 +10,7 @@ import Quick
 import Nimble
 import TccSwift
 
-fileprivate let BANNER = "== \"v2.2.0\" Test: Power on and leave the Core Cube on your desk to start the test. =="
-
+/// "v2.2.0" Test: Power on and leave the Core Cube on your desk to start the test.
 class TestWithCube_v2_2_0: QuickSpec {
     var bleProtocolVersion:String?
     var locationNotificationFrequencyIsSet:Bool?
@@ -47,28 +46,33 @@ class TestWithCube_v2_2_0: QuickSpec {
         
         var notifyId:UInt?
         
-        beforeSuite {
-            print(BANNER)
-            cube = testInitializeCube()
-            
+        beforeEach {
+            cube = TestCubeProvider.initialize()
             notifyId = cube.startNotifyConfiguration {
                 self.updateWithConfigurationResult($0)
             }
-            cube.writeConfigurationRequestBLEProtocolVersion {
-                expect($0).to(succeeded())
-            }
-            
-            expect(self.bleProtocolVersion).toEventually(beGreaterThanOrEqualTo("2.2.0"), timeout: 5)
-            print("the Cube's protocol version: \(self.bleProtocolVersion!)")
         }
         
+        afterEach {
+            if notifyId != nil {
+                cube.stopNotifyConfiguration(notifyId!)
+            }
+        }
+
         afterSuite {
-            cube.stopNotifyConfiguration(notifyId!)
-            testFinalizeCube(cube)
+            TestCubeProvider.finalize()
         }
         
         describe("Cube") {
             describe("Configuration") {
+                
+                it("Version Check") {
+                    cube.writeConfigurationRequestBLEProtocolVersion {
+                        expect($0).to(succeeded())
+                    }
+                    expect(self.bleProtocolVersion).toEventually(beGreaterThanOrEqualTo("2.2.0"))
+                    print("the Cube's protocol version: \(self.bleProtocolVersion!)")
+                }
 
                 it("Configuration Id Notification Frequency") {
                     cube?.writeConfigurationIdNotificationFrequency(interval: 0.03, condition: .atLeast300millisec) {

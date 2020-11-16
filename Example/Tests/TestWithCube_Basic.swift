@@ -10,20 +10,18 @@ import Quick
 import Nimble
 import TccSwift
 
-fileprivate let BANNER = "== \"Leave it\" Test: Power on and leave the Core Cube on your desk to start the test. =="
-
+/// "Leave it" Test: Power on and leave the Core Cube on your desk to start the test.
 class TestWithCube_Basic: QuickSpec {
     override func spec() {
         
         var cube:Cube!
         
-        beforeSuite {
-            print(BANNER)
-            cube = testInitializeCube()
+        beforeEach {
+            cube = TestCubeProvider.initialize()
         }
         
         afterSuite {
-            testFinalizeCube(cube)
+            TestCubeProvider.finalize()
         }
         
         describe("Cube") {
@@ -157,7 +155,7 @@ class TestWithCube_Basic: QuickSpec {
                 }
                 
             }
-
+            
             context("Configuration Write") {
                 
                 it("Configuration Motion Senser Level Threshold") {
